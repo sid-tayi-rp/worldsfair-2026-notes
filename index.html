@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineer World&rsquo;s Fair 2026 &mdash; Field Notes, Remixed</title>
+<meta name="description" content="A curated, redesigned highlight reel from AI Engineer World's Fair 2026 — loops, harness design, Google, open-weight models, hardware, browser agents, model routing, and voice — by Siddharth Tayi.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-0: #06070b;
+    --bg-1: #0d0e17;
+    --bg-2: #14151f;
+    --ink: #f3f0ea;
+    --ink-dim: #aba7ba;
+    --ink-faint: #6e6b7d;
+    --violet: #a78bfa;
+    --gold: #f3b969;
+    --glass: rgba(255,255,255,0.045);
+    --glass-2: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.10);
+
+    --c-harness: #a78bfa;
+    --c-loops: #2dd4bf;
+    --c-google: #60a5fa;
+    --c-openweights: #34d399;
+    --c-hardware: #fb7185;
+    --c-localllms: #fbbf24;
+    --c-routing: #22d3ee;
+    --c-voice: #f472b6;
+    --c-browser: #fb923c;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg-0);
+    color: var(--ink);
+    overflow: hidden;
+    height: 100vh;
+    position: relative;
+  }
+
+  /* Aurora background */
+  .aurora { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .aurora span {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.35;
+    will-change: transform;
+  }
+  .aurora .a1 { width: 620px; height: 620px; background: var(--violet); top: -220px; left: -160px; animation: drift1 34s ease-in-out infinite; }
+  .aurora .a2 { width: 560px; height: 560px; background: var(--gold); bottom: -220px; right: -140px; opacity: 0.22; animation: drift2 40s ease-in-out infinite; }
+  .aurora .a3 { width: 420px; height: 420px; background: #2dd4bf; top: 40%; right: 8%; opacity: 0.14; animation: drift3 46s ease-in-out infinite; }
+
+  @keyframes drift1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(60px, 40px); } }
+  @keyframes drift2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-50px, -60px); } }
+  @keyframes drift3 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-40px, 50px); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aurora span { animation: none !important; }
+  }
+
+  .deck { position: relative; width: 100%; height: 100vh; z-index: 1; }
+
+  .slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100vh;
+    padding: 64px 76px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    max-width: 1180px;
+    margin: 0 auto;
+    right: 0;
+  }
+
+  .slide.active { opacity: 1; pointer-events: auto; }
+  .slide.hero { justify-content: center; }
+
+  /* Nav */
+  .nav {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 100;
+    background: rgba(20,21,31,0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 9px 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  }
+  .nav-btn {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.16);
+    color: var(--ink-dim);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.08); color: var(--ink); border-color: var(--violet); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-dots { display: flex; gap: 6px; }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-dot.active { background: var(--violet); box-shadow: 0 0 10px var(--violet); width: 16px; border-radius: 4px; }
+  .nav-counter { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-faint); font-weight: 500; min-width: 48px; text-align: center; }
+
+  /* Typography */
+  .tags { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 5px 11px 5px 9px;
+    border-radius: 20px;
+    border: 1px solid color-mix(in srgb, var(--tag) 55%, transparent);
+    background: color-mix(in srgb, var(--tag) 14%, transparent);
+    color: color-mix(in srgb, var(--tag) 85%, white);
+  }
+  .tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--tag); box-shadow: 0 0 8px var(--tag); }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 52px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.08;
+    margin-bottom: 20px;
+    background: linear-gradient(120deg, #ffffff 0%, var(--violet) 55%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 29px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.3px;
+    margin-bottom: 20px;
+  }
+
+  .subtitle {
+    font-size: 16.5px;
+    color: var(--ink-dim);
+    line-height: 1.65;
+    max-width: 760px;
+    margin-bottom: 28px;
+  }
+  .meta { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--ink-faint); margin-top: 34px; letter-spacing: 0.3px; }
+
+  .detail-items { list-style: none; padding: 0; }
+  .detail-items li {
+    color: #d7d4e0;
+    padding: 6px 0 6px 20px;
+    position: relative;
+    font-size: 15.5px;
+    line-height: 1.68;
+  }
+  .detail-items li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 16px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--violet);
+    box-shadow: 0 0 6px var(--violet);
+  }
+  .detail-items li strong { color: var(--ink); font-weight: 600; }
+
+  .bigword { font-family: 'Space Grotesk', sans-serif; font-size: 25px; font-weight: 600; color: var(--ink); line-height: 1.5; max-width: 900px; }
+  .bigword em { color: var(--gold); font-style: normal; }
+
+  table.equiv { width: 100%; max-width: 1040px; border-collapse: collapse; margin: 8px 0; font-size: 14px; }
+  table.equiv th {
+    text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--ink-faint); font-weight: 600; padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  table.equiv td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #cfccdb; vertical-align: top; line-height: 1.55; }
+  table.equiv td:first-child { font-weight: 600; color: var(--ink); }
+  table.equiv tr:last-child td { border-bottom: none; }
+
+  .callout {
+    background: var(--glass);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 12px;
+    padding: 15px 20px; max-width: 900px; margin-top: 18px;
+    font-size: 14.5px; color: #f0e6cf; font-weight: 500; line-height: 1.6;
+  }
+
+  .thesis {
+    color: var(--ink);
+    font-size: 21px;
+    font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif;
+    line-height: 1.42;
+    max-width: 920px;
+    margin-bottom: 18px;
+  }
+
+  .credit {
+    position: absolute;
+    right: 76px;
+    bottom: 26px;
+    color: var(--ink-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .credit::before { content: '\2014 '; }
+
+  /* ═══ DOC MODE ═══ */
+  .mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 200;
+    background: rgba(20,21,31,0.72);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    color: var(--ink-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 9px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    letter-spacing: 0.4px;
+  }
+  .mode-toggle:hover { background: rgba(255,255,255,0.08); color: var(--ink); border-color: var(--violet); }
+
+  body.print-mode { overflow: auto; height: auto; }
+  body.print-mode .deck { height: auto; }
+  body.print-mode .slide {
+    position: static;
+    opacity: 1;
+    pointer-events: auto;
+    height: auto;
+    min-height: 0;
+    padding: 56px 76px;
+    border-bottom: 1px solid var(--border);
+    transition: none;
+  }
+  body.print-mode .slide:last-child { border-bottom: none; }
+  body.print-mode .nav { display: none; }
+  body.print-mode .credit { position: static; display: block; margin-top: 18px; }
+
+  @media (max-width: 860px) {
+    .slide { padding: 44px 26px; }
+    h1 { font-size: 34px; }
+    h2 { font-size: 22px; }
+    .thesis { font-size: 18px; }
+    .credit { right: 26px; }
+  }
+
+  @media print {
+    body { overflow: auto !important; height: auto !important; background: #fff !important; color: #111 !important; }
+    .aurora, .nav, .mode-toggle { display: none !important; }
+    .deck { height: auto !important; }
+    .slide {
+      position: static !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      height: auto !important;
+      min-height: 0 !important;
+      transition: none !important;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      page-break-after: always;
+      break-after: page;
+    }
+    h1 { -webkit-text-fill-color: #111; background: none; color: #111 !important; }
+    .thesis, h2 { color: #111 !important; }
+    .detail-items li, table.equiv td { color: #222 !important; }
+    .callout { background: #f4f4f4 !important; color: #222 !important; border-color: #ccc !important; }
+    .credit { position: static !important; color: #666 !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="aurora"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
+
+<div class="deck">
+
+  <!-- 0: Hero -->
+  <div class="slide hero active" data-slide="0">
+    <h1>AI Engineer World&rsquo;s Fair 2026:<br>field notes, remixed</h1>
+    <div class="subtitle">Nine threads pulled from four days in San Francisco &mdash; loops, harness design, Google&rsquo;s latest, open-weight models, hardware, browser agents, model routing, and a few voice-agent lessons. Curated and rewritten by Siddharth Tayi, with several ideas drawn from Ayush Joshi&rsquo;s and Joe Dean&rsquo;s original knowledge-share deck.</div>
+    <div class="tags">
+      <span class="tag" style="--tag:var(--c-harness)">Harness</span>
+      <span class="tag" style="--tag:var(--c-loops)">Loops</span>
+      <span class="tag" style="--tag:var(--c-google)">Google</span>
+      <span class="tag" style="--tag:var(--c-openweights)">Open weights</span>
+      <span class="tag" style="--tag:var(--c-hardware)">Hardware</span>
+      <span class="tag" style="--tag:var(--c-localllms)">Local LLMs</span>
+      <span class="tag" style="--tag:var(--c-routing)">Model routing</span>
+      <span class="tag" style="--tag:var(--c-voice)">Voice</span>
+      <span class="tag" style="--tag:var(--c-browser)">Browser agents</span>
+    </div>
+    <div class="meta">RealPage &middot; IT &mdash; BEST &middot; San Francisco, Jun 29&ndash;Jul 2, 2026</div>
+  </div>
+
+  <!-- 1: Harness thesis -->
+  <div class="slide" data-slide="1">
+    <div class="tags"><span class="tag" style="--tag:var(--c-harness)">Harness</span></div>
+    <h2>The question changed: not which model, but which harness</h2>
+    <div class="bigword">Last year the industry argued about <em>which model</em>. This year nobody argued about models &mdash; the whole conference argued about <em>the harness</em>: how you plan, loop, verify, and govern the agents that models power.</div>
+    <div class="bigword" style="margin-top:24px;">And the sharpest debate underneath it &mdash; lights-off software factories vs. humans conducting orchestras &mdash; landed on the orchestra: a human orchestrating and reviewing the agents, never stepping out of the loop.</div>
+    <div class="credit">Joe Dean</div>
+  </div>
+
+  <!-- 2: Loops -->
+  <div class="slide" data-slide="2">
+    <div class="tags"><span class="tag" style="--tag:var(--c-loops)">Loops</span></div>
+    <h2>Loops that survive real codebases</h2>
+    <ul class="detail-items">
+      <li><strong>Kyle Mistele (HumanLayer):</strong> blind &ldquo;run it in a bash loop&rdquo; agents don&rsquo;t fit teams with customers and SLAs. Build agentic control loops from control theory instead: set point &rarr; sensor (linters, ast-grep) &rarr; controller picks <em>one small change</em> &rarr; actuator (agent + skill).</li>
+      <li>One iteration per scheduled run, producing <strong>one labeled PR</strong> &mdash; the loop halts while the last PR sits unreviewed. Steering lives in a version-controlled feedback file.</li>
+      <li><strong>Lance Martin:</strong> long-horizon reliability is architecture &mdash; decouple the harness (&ldquo;brain&rdquo;) from sandboxed execution (&ldquo;hands&rdquo;); credentials live in a vault, never in the sandbox. Independent verifier loops grade the outcome.</li>
+      <li><strong>Theo Browne:</strong> today&rsquo;s frontier models already orchestrate &mdash; spawning sub-agents, splitting and verifying work &mdash; on prompt alone. &ldquo;We need to go bigger.&rdquo;</li>
+    </ul>
+    <div class="callout">The strongest production loops already look like control systems, not chat sessions &mdash; a one-open-PR gate and a version-controlled feedback file are the upgrade worth stealing.</div>
+    <div class="credit">Joe Dean</div>
+  </div>
+
+  <!-- 3: Harness / Ayush -->
+  <div class="slide" data-slide="3">
+    <div class="tags"><span class="tag" style="--tag:var(--c-harness)">Harness</span></div>
+    <h2>The durable product is the harness around the model</h2>
+    <div class="thesis">Traces, evals, diagnosis, bounded auto-fix, and a closed improvement loop convert real failures into reusable system knowledge.</div>
+    <ul class="detail-items">
+      <li><strong>Observe:</strong> traces preserve the context, path, tool calls, cost, latency, and outcome.</li>
+      <li><strong>Diagnose:</strong> failures are classified as model, context, tool, policy, orchestration, or UX defects.</li>
+      <li><strong>Codify:</strong> the fix becomes an eval, deterministic check, skill, policy, or runtime change.</li>
+      <li><strong>Verify:</strong> the new contract is tested before the loop is allowed to expand autonomy.</li>
+    </ul>
+    <div class="callout"><strong>Value:</strong> usage makes the platform more reliable instead of generating the same incident at higher volume. <strong>Failure mode:</strong> without this loop, more autonomy only accelerates repeat mistakes.</div>
+    <div class="credit">Ayush Joshi</div>
+  </div>
+
+  <!-- 4: Google / Open weights -->
+  <div class="slide" data-slide="4">
+    <div class="tags">
+      <span class="tag" style="--tag:var(--c-google)">Google</span>
+      <span class="tag" style="--tag:var(--c-openweights)">Open weights</span>
+    </div>
+    <h2>Inside Google, and the open-weights front</h2>
+    <ul class="detail-items">
+      <li><strong>Google DeepMind:</strong> the new <strong>Interactions API</strong> &mdash; one unified call for models <em>and</em> agents, server-side state, sandboxes, background execution; explicitly moving past turn-based chat.</li>
+      <li><strong>Z.ai&rsquo;s GLM-5.2 keynote:</strong> open-weight frontier models &ldquo;built for long-horizon tasks&rdquo; keep the routing/cost conversation alive &mdash; and set up the local/open-weight thread the rest of this deck follows.</li>
+    </ul>
+    <div class="credit">Joe Dean</div>
+  </div>
+
+  <!-- 5: Model routing / Ayush -->
+  <div class="slide" data-slide="5">
+    <div class="tags"><span class="tag" style="--tag:var(--c-routing)">Model routing</span></div>
+    <h2>The right model is the smallest one that meets the quality bar</h2>
+    <div class="thesis">Model choice and serving architecture work together. A smaller, task-fit model on an inference-optimized platform can improve latency, cost, and throughput without sacrificing the outcome.</div>
+    <ul class="detail-items">
+      <li><strong>Start smaller:</strong> route routine, bounded work to smaller models; reserve frontier models for ambiguity, complex reasoning, and higher-risk decisions.</li>
+      <li><strong>Optimize the serving layer:</strong> inference-focused platforms such as Together AI improve performance through optimized batching, caching, quantization, and hardware.</li>
+      <li><strong>Measure the real workload:</strong> compare task success, p50/p95 latency, and cost per successful task under realistic concurrency &mdash; not a single-request benchmark.</li>
+    </ul>
+    <div class="callout"><strong>Decision:</strong> use the smallest model that clears the evals on an optimized serving platform. Add model capability or infrastructure control only when quality, privacy, or the SLO requires it.</div>
+    <div class="credit">Ayush Joshi</div>
+  </div>
+
+  <!-- 6: Voice 1 / Ayush -->
+  <div class="slide" data-slide="6">
+    <div class="tags"><span class="tag" style="--tag:var(--c-voice)">Voice</span></div>
+    <h2>Voice is the stress test for the entire agent architecture</h2>
+    <div class="thesis">Voice is not an audio wrapper around chat. It is a realtime agent runtime that exposes every weakness in state, latency, tools, and recovery.</div>
+    <ul class="detail-items">
+      <li><strong>Conversation mechanics:</strong> turn detection, interruption, silence, noise, and full-duplex behavior decide whether the system feels human or broken.</li>
+      <li><strong>Runtime state:</strong> policy, context, tools, UI state, and long-running tasks must continue changing while someone speaks.</li>
+      <li><strong>Latency is a budget:</strong> speech recognition, end-of-turn detection, model work, tools, and speech generation all spend from the same experience budget.</li>
+      <li><strong>Correctness is observable behavior:</strong> did the tool complete, did the user hear the right status, and did the system escalate cleanly?</li>
+    </ul>
+    <div class="callout"><strong>Required evals:</strong> interruption recovery, end-of-turn to first audio, tool completion, state consistency, and escalation &mdash; at p50 and tail latency.</div>
+    <div class="credit">Ayush Joshi</div>
+  </div>
+
+  <!-- 7: Voice 2 / Ayush -->
+  <div class="slide" data-slide="7">
+    <div class="tags"><span class="tag" style="--tag:var(--c-voice)">Voice</span></div>
+    <h2>There is no single voice stack</h2>
+    <div class="thesis">The architecture determines what we can optimize, inspect, and control. The right choice depends on the workflow&rsquo;s risk &mdash; not which demo sounds most human.</div>
+    <table class="equiv">
+      <tr><th>Architecture</th><th>Strength</th><th>Tradeoff</th></tr>
+      <tr><td>Cascaded<br><span style="color:var(--ink-faint)">speech &rarr; text &rarr; reasoning &rarr; speech</span></td><td>Modular, inspectable, and easier to connect to tools, policy, and existing text agents</td><td>Every stage adds latency; transcription can discard tone, timing, and ambiguity</td></tr>
+      <tr><td>Speech-to-speech</td><td>Lower-latency, expressive interaction with more natural timing and prosody</td><td>Harder to inspect, govern, ground in tools, and explain when behavior fails</td></tr>
+      <tr><td>Hybrid production stack</td><td>Speech-native interaction with explicit state, tools, policy checks, and verification</td><td>More orchestration, but control and naturalness can be tuned independently</td></tr>
+    </table>
+    <div class="callout"><strong>Decision rule:</strong> use the simplest architecture that meets both the interaction SLO and the workflow&rsquo;s control requirements.</div>
+    <div class="credit">Ayush Joshi</div>
+  </div>
+
+  <!-- 8: Voice 3 / Ayush -->
+  <div class="slide" data-slide="8">
+    <div class="tags"><span class="tag" style="--tag:var(--c-voice)">Voice</span></div>
+    <h2>Humanlike behavior is a system metric, not a model benchmark</h2>
+    <div class="thesis">Users experience one delay, but the budget is spent across end-of-turn detection, recognition, reasoning, tools, speech generation, and the network.</div>
+    <ul class="detail-items">
+      <li><strong>Optimize the whole turn:</strong> making speech generation faster does not help when tool execution or end-of-turn detection dominates the wait.</li>
+      <li><strong>Measure the tails:</strong> averages hide the pauses that make a conversation feel broken. Track p50 and p95 from end-of-user-turn to first meaningful audio.</li>
+      <li><strong>Protect the interaction:</strong> false cutoffs, missed barge-in, talking over the user, filler loops, and failure to resume after interruption are product defects.</li>
+      <li><strong>Test conversations, not components:</strong> a good ASR score, model score, and TTS score can still combine into a bad call.</li>
+    </ul>
+    <div class="callout"><strong>Minimum scorecard:</strong> end-of-turn to first audio, interruption recovery, false-cutoff rate, task completion, state consistency, escalation quality, and cost per completed outcome.</div>
+    <div class="credit">Ayush Joshi</div>
+  </div>
+
+  <!-- 9: Google overview / Siddharth -->
+  <div class="slide" data-slide="9">
+    <div class="tags"><span class="tag" style="--tag:var(--c-google)">Google</span></div>
+    <h2>Gemini 3.1 raises the bar on OCR, audio, video, and latency</h2>
+    <div class="thesis">Gemini 3.1 reads less like an incremental update and more like a step-change across every multimodal fundamental &mdash; and it sits inside a DeepMind research mission that reaches well past chatbots.</div>
+    <ul class="detail-items">
+      <li><strong>Multimodal fundamentals, reset:</strong> OCR, audio transcription, video understanding, and latency all move up a tier, backed by a faster streaming pipeline that returns results noticeably sooner.</li>
+      <li><strong>Image generation</strong> takes a dramatic jump in this release &mdash; not an incremental tweak.</li>
+      <li><strong>Tool calling</strong> was the standout at the booth: DeepMind&rsquo;s tool-calling is a real edge for anyone building agents on top of the model.</li>
+      <li><strong>The DeepMind mandate:</strong> research scientists, engineers, and ethicists building the next generation of AI systems safely and responsibly &mdash; the same lab behind <strong>AlphaFold</strong> and <strong>AlphaGo</strong>.</li>
+    </ul>
+    <div class="credit">Siddharth Tayi</div>
+  </div>
+
+  <!-- 10: Gemini vs Gemma / Siddharth -->
+  <div class="slide" data-slide="10">
+    <div class="tags"><span class="tag" style="--tag:var(--c-google)">Google</span></div>
+    <h2>Gemini 3.1 Flash and Gemma are close &mdash; except on video</h2>
+    <div class="thesis">Gemma shadows Gemini 3.1 Flash closely on quality; the real divergence shows up in just two tasks.</div>
+    <table class="equiv">
+      <tr><th>Task</th><th>Gemini 3.1 Flash</th><th>Gemma</th></tr>
+      <tr><td>Video</td><td>Best of the two &mdash; the clearer pick for video-heavy work</td><td>Very similar, but Flash still wins here</td></tr>
+      <tr><td>Language translation</td><td>Superior &mdash; supports far more languages</td><td>Good, but a narrower set of supported languages</td></tr>
+    </table>
+    <div class="callout">Default to <strong>Gemini 3.1 Flash</strong> for video and wide-language translation; <strong>Gemma</strong> earns its keep everywhere else.</div>
+    <div class="credit">Siddharth Tayi</div>
+  </div>
+
+  <!-- 11: Gemma 4 / Siddharth -->
+  <div class="slide" data-slide="11">
+    <div class="tags">
+      <span class="tag" style="--tag:var(--c-google)">Google</span>
+      <span class="tag" style="--tag:var(--c-hardware)">Hardware</span>
+    </div>
+    <h2>Gemma 4 puts frontier techniques on your phone</h2>
+    <div class="thesis">Google is now shipping models that run on a slice of the phone&rsquo;s own processor and do the job of far larger, machine-hosted models. Gemma 4 is the clearest proof yet: a noticeably faster generation that trades some latency for running fully on-device, while staying on par with Gemini 3.1 on streaming, audio transcription, and overall intelligence.</div>
+    <ul class="detail-items">
+      <li><strong>Advanced reasoning:</strong> configurable thinking modes (chain-of-thought inference) built for complex logic and multi-step planning.</li>
+      <li><strong>Multi-token prediction (MTP):</strong> built-in drafter models predict several future tokens at once, accelerating local inference with no loss in output quality.</li>
+      <li><strong>Native multimodality:</strong> text and images natively; the smaller E2B and E4B variants add native audio for speech recognition and translation; the 12B variant runs visual and audio data directly through the language model, encoder-free.</li>
+      <li><strong>Built for agents:</strong> an intelligence-per-parameter design built natively for multi-step reasoning, multimodal processing, and function calling.</li>
+    </ul>
+    <div class="callout">The booth&rsquo;s best moment: this model running live, on a phone, in the demo &mdash; AI genuinely at your fingertips.</div>
+    <div class="credit">Siddharth Tayi</div>
+  </div>
+
+  <!-- 12: GLM DGX demo / Siddharth -->
+  <div class="slide" data-slide="12">
+    <div class="tags">
+      <span class="tag" style="--tag:var(--c-hardware)">Hardware</span>
+      <span class="tag" style="--tag:var(--c-openweights)">Open weights</span>
+    </div>
+    <h2>GLM 5.2 on DGX Station: frontier intelligence under your desk</h2>
+    <div class="thesis">Frontier-scale intelligence is migrating from the datacenter to the desk, as GPUs and models both get more efficient.</div>
+    <ul class="detail-items">
+      <li><strong>Live demo:</strong> GLM models running on an NVIDIA DGX Station &mdash; Ahmad M. Osman, Founder/CEO, Osmanatic.</li>
+      <li><strong>Near-term roadmap (?):</strong> GLM-class models on a single RTX 5090 (64GB) by mid&ndash;2027, with a further jump by late 2027 &mdash; the exact sequencing wasn&rsquo;t fully clear from the session.</li>
+      <li><strong>The longer arc:</strong> as models get more parameter-efficient, that same capability trickles down to older, lower-tier cards &mdash; RTX 30-series through 50-series &mdash; not just this year&rsquo;s flagship.</li>
+    </ul>
+    <div class="callout">Hardware efficiency, not just model size, is what determines when frontier intelligence fits under your desk.</div>
+    <div class="credit">Siddharth Tayi</div>
+  </div>
+
+  <!-- 13: Local LLMs / Siddharth -->
+  <div class="slide" data-slide="13">
+    <div class="tags">
+      <span class="tag" style="--tag:var(--c-localllms)">Local LLMs</span>
+      <span class="tag" style="--tag:var(--c-hardware)">Hardware</span>
+    </div>
+    <h2>Local LLMs: hardware is the new oil</h2>
+    <div class="thesis">NVIDIA and a panel of CEOs made the case that local LLMs are a bigger platform shift than most roadmaps assume &mdash; and that hardware, not the model, is the bottleneck to watch.</div>
+    <ul class="detail-items">
+      <li><strong>Lowering the bar to run local:</strong> vendors are building the tooling that lets developers configure and install local models easily, delivering high performance on far less compute.</li>
+      <li><strong>NVIDIA as the platform:</strong> partnered across the ecosystem and positioning itself as the hardware layer underneath both hosting and training.</li>
+      <li><strong>The resource case for local:</strong> pitched as a way to cut cost across tokens, hardware, and natural resources like water &mdash; not just a latency or privacy win.</li>
+    </ul>
+    <div class="callout">Local inference is being pitched as a sustainability story as much as a cost story &mdash; a real counterweight to cloud-only strategy.</div>
+    <div class="credit">Siddharth Tayi</div>
+  </div>
+
+  <!-- 14: Model routing / Siddharth -->
+  <div class="slide" data-slide="14">
+    <div class="tags"><span class="tag" style="--tag:var(--c-routing)">Model routing</span></div>
+    <h2>Give each agent the model built for its job</h2>
+    <div class="thesis">Stop sending every task to one model. Route by task, and let each sub-agent run the model that&rsquo;s actually strong in that domain.</div>
+    <ul class="detail-items">
+      <li><strong>Domain-tuned sub-agents:</strong> one model fine-tuned toward science, another toward coding &mdash; the platform spins up whichever sub-agent carries the model the task actually needs.</li>
+      <li><strong>Not every agent needs the frontier model:</strong> a reporting agent has no use for the top-of-line model when a much smaller, cheaper one does the job just as well.</li>
+      <li><strong>Model routing, defined:</strong> given a task, the platform selects the right model for it automatically &mdash; no manual wiring required.</li>
+    </ul>
+    <div class="callout">Every agent spun up this way carries its own model, context, memory, and tools: a mini harness in its own right.</div>
+    <div class="credit">Siddharth Tayi</div>
+  </div>
+
+  <!-- 15: Context/cost/cache / Siddharth -->
+  <div class="slide" data-slide="15">
+    <div class="tags"><span class="tag" style="--tag:var(--c-routing)">Model routing</span></div>
+    <h2>Context lives with one model &mdash; cost still has to be earned</h2>
+    <div class="thesis">Split work across a main model and smaller task models, and one question dominates: where does the context actually live?</div>
+    <ul class="detail-items">
+      <li><strong>One model owns the context:</strong> the full context stays with a single main model; smaller models get only the slice their task needs, never the whole session.</li>
+      <li><strong>Cheaper per token &ne; cheaper overall:</strong> a lower per-token price can still lose to a pricier model once the extra tokens and round-trips it takes to get there are counted &mdash; an optimization problem, not a pricing one.</li>
+      <li><strong>The KV cache is the real lever, and it&rsquo;s still unsolved:</strong> context switching runs through it, but there&rsquo;s no clean way yet to target or optimize work against it directly. <span style="color:var(--ink-faint)">(A tool referenced as &ldquo;Cachette&rdquo; came up here (?).)</span></li>
+      <li><strong>New operating habits for multi-model fleets:</strong> heartbeat every model, and keep a fallback configured for when one fails.</li>
+    </ul>
+    <div class="credit">Siddharth Tayi</div>
+  </div>
+
+  <!-- 16: Harness evolution / Siddharth -->
+  <div class="slide" data-slide="16">
+    <div class="tags"><span class="tag" style="--tag:var(--c-harness)">Harness</span></div>
+    <h2>From instructions, to agents, to agents on the fly</h2>
+    <div class="thesis">The harness pattern has moved through four stages, each one stripping out a layer of manual setup.</div>
+    <table class="equiv">
+      <tr><th>Stage</th><th>What happens</th></tr>
+      <tr><td>Direct instruction</td><td>You tell Claude or Codex what to do, and it does it &mdash; no persistent agent structure.</td></tr>
+      <tr><td>Agents</td><td>You create an agent and assign it a task, a goal, and a role.</td></tr>
+      <tr><td>Sub-agents</td><td>Sub-agents get created as needed, per request, under a parent agent.</td></tr>
+      <tr><td>Agents on the fly</td><td>You just give Claude context; it spins up the agents it needs on the fly, using the harness already in place.</td></tr>
+    </table>
+    <div class="callout">Context, memory, and session state across this divide-and-conquer mix of models is still the open problem &mdash; the thing every vendor in the room was actively trying to solve.</div>
+    <div class="credit">Siddharth Tayi</div>
+  </div>
+
+  <!-- 17: Browserbase / Siddharth -->
+  <div class="slide" data-slide="17">
+    <div class="tags"><span class="tag" style="--tag:var(--c-browser)">Browser agents</span></div>
+    <h2>Browser agents: a small-world moment at the Browserbase booth</h2>
+    <div class="thesis">Browserbase builds browser-based agents &mdash; and it&rsquo;s already the tool my own team runs on a live RealPage project. Met their sales engineer at the booth: small world.</div>
+    <ul class="detail-items">
+      <li><strong>Already in production here:</strong> Browserbase is running today on one of my team&rsquo;s RealPage projects.</li>
+      <li><strong>Prior art:</strong> I built a browser agent at a previous company that pulled tax data from county websites and ran OCR on it &mdash; the same shape of problem RealPage is solving now.</li>
+      <li><strong>LLMs &rarr; LAMs:</strong> the same trajectory that turned a chat model into a working tax-scraping OCR agent is now a supported category &mdash; browser-based <strong>language action models (LAMs)</strong> &mdash; instead of something every team builds from scratch.</li>
+    </ul>
+    <div class="credit">Siddharth Tayi</div>
+  </div>
+
+  <!-- 18: Colophon -->
+  <div class="slide" data-slide="18">
+    <div class="tags"><span class="tag" style="--tag:var(--c-harness)">Colophon</span></div>
+    <h2>Notes, remixed</h2>
+    <div class="subtitle" style="max-width:820px;">This page is a curated, redesigned remix of a longer knowledge-share deck &mdash; nine threads pulled out of 26 sessions across four days at AI Engineer World&rsquo;s Fair 2026.</div>
+    <ul class="detail-items">
+      <li>Original knowledge-share deck and several synthesis slides &mdash; <strong>Joe Dean</strong>, AI Internal Enablement.</li>
+      <li>Model-routing, harness, and voice synthesis slides &mdash; <strong>Ayush Joshi</strong>, External AI Lead Engineer.</li>
+      <li>Curation, redesign, and the Google / hardware / local LLM / browser-agent / model-routing notes &mdash; <strong>Siddharth Tayi</strong>, IT &mdash; BEST.</li>
+    </ul>
+    <div class="meta">AI Engineer World&rsquo;s Fair 2026 &middot; San Francisco &middot; Jun 29&ndash;Jul 2</div>
+  </div>
+
+</div>
+
+<button class="mode-toggle" id="modeToggle">Doc mode</button>
+
+<div class="nav">
+  <button class="nav-btn" id="prevBtn">&#8592;</button>
+  <div class="nav-dots" id="navDots"></div>
+  <div class="nav-counter" id="navCounter"></div>
+  <button class="nav-btn" id="nextBtn">&#8594;</button>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dotsWrap = document.getElementById('navDots');
+  var counter = document.getElementById('navCounter');
+  var prevBtn = document.getElementById('prevBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var modeToggle = document.getElementById('modeToggle');
+  var current = 0;
+
+  slides.forEach(function(_, i){
+    var d = document.createElement('div');
+    d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', function(){ go(i); });
+    dotsWrap.appendChild(d);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function go(i){
+    if (i < 0 || i >= slides.length) return;
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = i;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    if (history.replaceState) history.replaceState(null, '', '#slide-' + (i + 1));
+    render();
+  }
+  function fromHash(){
+    var m = /^#slide-(\d+)$/.exec(location.hash);
+    if (m) { var i = parseInt(m[1], 10) - 1; if (i >= 0 && i < slides.length && i !== current) go(i); }
+  }
+  window.addEventListener('hashchange', fromHash);
+  function render(){
+    counter.textContent = (current + 1) + ' / ' + slides.length;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+  }
+  prevBtn.addEventListener('click', function(){ go(current - 1); });
+  nextBtn.addEventListener('click', function(){ go(current + 1); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(current + 1); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(current - 1); }
+    if (e.key === 'Home') { e.preventDefault(); go(0); }
+    if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
+  });
+  modeToggle.addEventListener('click', function(){
+    document.body.classList.toggle('print-mode');
+    modeToggle.textContent = document.body.classList.contains('print-mode') ? 'Deck mode' : 'Doc mode';
+  });
+  fromHash();
+  render();
+})();
+</script>
+
+</body>
+</html>
