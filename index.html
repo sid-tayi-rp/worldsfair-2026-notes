@@ -47,6 +47,26 @@
   body.has-mouse .spotlight { opacity: 1; }
   @media (prefers-reduced-motion: reduce) { .spotlight { display: none; } }
 
+  /* Right-margin folio — decorative counterweight to the left rail */
+  .folio {
+    position: fixed; right: 4.5%; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 22px;
+    z-index: 1; pointer-events: none;
+  }
+  .folio-num {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 500;
+    font-size: 15vh; line-height: 0.82; letter-spacing: -5px;
+    color: var(--accent-live); opacity: 0.10; transition: color 0.6s ease;
+    user-select: none;
+  }
+  .folio-rule { width: 1px; height: 64px; background: linear-gradient(var(--border), transparent); }
+  .folio-tag {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--ink-faint); white-space: nowrap;
+  }
+  @media (max-width: 1100px) { .folio { display: none; } }
+
   .rail {
     position: fixed; top: 0; left: 0; bottom: 0; width: 104px; z-index: 150;
     display: flex; flex-direction: column; align-items: center; justify-content: space-between;
@@ -203,13 +223,6 @@
   .pull-quote { font-family: 'Fraunces', serif; font-weight: 500; font-size: 33px; line-height: 1.42; max-width: 860px; color: var(--ink); margin-bottom: 26px; }
   .pull-quote .accent { color: var(--gold); font-style: italic; }
 
-  /* Colophon */
-  .colophon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 14px; }
-  .colophon-card { border-top: 2px solid var(--border); padding-top: 16px; }
-  .colophon-card .role { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gold); margin-bottom: 11px; }
-  .colophon-card .name { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; color: var(--ink); margin-bottom: 9px; }
-  .colophon-card p { font-size: 13px; color: var(--ink-dim); line-height: 1.6; }
-
   /* Doc mode */
   .mode-toggle {
     position: fixed; top: 20px; right: 20px; z-index: 200;
@@ -235,7 +248,7 @@
     h1 { font-size: 32px; }
     h2 { font-size: 22px; }
     .thesis { font-size: 18px; }
-    .split-grid, .card-grid.cols-2, .card-grid.cols-3, .colophon-grid { grid-template-columns: 1fr; gap: 26px; }
+    .split-grid, .card-grid.cols-2, .card-grid.cols-3 { grid-template-columns: 1fr; gap: 26px; }
     .stepper { flex-direction: column; gap: 20px; }
     .vs-badge { display: none; }
   }
@@ -257,6 +270,12 @@
 <div class="ambient" id="ambientB"></div>
 <div class="spotlight" id="spotlight"></div>
 
+<div class="folio">
+  <div class="folio-num" id="folioNum">01</div>
+  <div class="folio-rule"></div>
+  <div class="folio-tag" id="folioTag">Overview</div>
+</div>
+
 <div class="rail">
   <div class="rail-top">
     <div class="rail-index" id="railIndex">01</div>
@@ -275,7 +294,7 @@
   <!-- 0: Hero -->
   <div class="slide layout-hero active" data-slide="0" data-tint="#a78bfa" data-topic="Overview">
     <h1>AI Engineer World&rsquo;s Fair 2026:<br><em>field notes, remixed</em></h1>
-    <div class="subtitle">Nine threads pulled from four days in San Francisco &mdash; loops, harness design, Google&rsquo;s latest, open-weight models, hardware, browser agents, model routing, and a few voice-agent lessons. Curated and rewritten by Siddharth Tayi, with several ideas drawn from Ayush Joshi&rsquo;s and Joe Dean&rsquo;s original knowledge-share deck.</div>
+    <div class="subtitle">Nine threads pulled from four days in San Francisco &mdash; loops, harness design, Google&rsquo;s latest, open-weight models, hardware, browser agents, model routing, and a few voice-agent lessons. Curated and written by Siddharth Tayi.</div>
     <div class="tags">
       <span class="tag" style="--tag:#a78bfa">Harness</span>
       <span class="tag" style="--tag:#2dd4bf">Loops</span>
@@ -572,31 +591,6 @@
     </ul>
   </div>
 
-  <!-- 18: Colophon -->
-  <div class="slide layout-colophon" data-slide="18" data-tint="#eec080" data-topic="Colophon">
-    <div class="tags"><span class="tag" style="--tag:#eec080">Colophon</span></div>
-    <h2>Notes, remixed</h2>
-    <div class="subtitle" style="max-width:820px;">This page is a curated, redesigned remix of a longer knowledge-share deck &mdash; nine threads pulled out of 26 sessions across four days at AI Engineer World&rsquo;s Fair 2026.</div>
-    <div class="colophon-grid">
-      <div class="colophon-card">
-        <div class="role">Original deck</div>
-        <div class="name">Joe Dean</div>
-        <p>AI Internal Enablement. Original knowledge-share deck and several synthesis slides.</p>
-      </div>
-      <div class="colophon-card">
-        <div class="role">Synthesis slides</div>
-        <div class="name">Ayush Joshi</div>
-        <p>External AI Lead Engineer. Model-routing, harness, and voice synthesis slides.</p>
-      </div>
-      <div class="colophon-card">
-        <div class="role">This remix</div>
-        <div class="name">Siddharth Tayi</div>
-        <p>IT &mdash; BEST. Curation, redesign, and the Google / hardware / local LLM / browser-agent / model-routing notes.</p>
-      </div>
-    </div>
-    <div class="meta">AI Engineer World&rsquo;s Fair 2026 &middot; San Francisco &middot; Jun 29&ndash;Jul 2</div>
-  </div>
-
 </div>
 
 <button class="mode-toggle" id="modeToggle">Doc mode</button>
@@ -608,6 +602,8 @@
   var railTotal = document.getElementById('railTotal');
   var railFill = document.getElementById('railFill');
   var railTopic = document.getElementById('railTopic');
+  var folioNum = document.getElementById('folioNum');
+  var folioTag = document.getElementById('folioTag');
   var prevBtn = document.getElementById('prevBtn');
   var nextBtn = document.getElementById('nextBtn');
   var modeToggle = document.getElementById('modeToggle');
@@ -661,6 +657,8 @@
     railTopic.textContent = topic;
     railTopic.style.color = tint;
     railFill.style.background = tint;
+    folioNum.textContent = pad(current + 1);
+    folioTag.textContent = topic;
     document.documentElement.style.setProperty('--accent-live', tint);
     applyAmbient(tint);
     prevBtn.disabled = current === 0;
