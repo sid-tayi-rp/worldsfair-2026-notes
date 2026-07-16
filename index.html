@@ -12,15 +12,12 @@
 
   :root {
     --bg-0: #06070b;
-    --bg-1: #0d0e17;
-    --bg-2: #14151f;
     --ink: #f3f0ea;
     --ink-dim: #aba7ba;
     --ink-faint: #6e6b7d;
     --violet: #a78bfa;
     --gold: #f3b969;
     --glass: rgba(255,255,255,0.045);
-    --glass-2: rgba(255,255,255,0.07);
     --border: rgba(255,255,255,0.10);
 
     --c-harness: #a78bfa;
@@ -47,26 +44,16 @@
 
   /* Aurora background */
   .aurora { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-  .aurora span {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(90px);
-    opacity: 0.35;
-    will-change: transform;
-  }
+  .aurora span { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.35; will-change: transform; }
   .aurora .a1 { width: 620px; height: 620px; background: var(--violet); top: -220px; left: -160px; animation: drift1 34s ease-in-out infinite; }
   .aurora .a2 { width: 560px; height: 560px; background: var(--gold); bottom: -220px; right: -140px; opacity: 0.22; animation: drift2 40s ease-in-out infinite; }
   .aurora .a3 { width: 420px; height: 420px; background: #2dd4bf; top: 40%; right: 8%; opacity: 0.14; animation: drift3 46s ease-in-out infinite; }
-
   @keyframes drift1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(60px, 40px); } }
   @keyframes drift2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-50px, -60px); } }
   @keyframes drift3 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-40px, 50px); } }
+  @media (prefers-reduced-motion: reduce) { .aurora span { animation: none !important; } }
 
-  @media (prefers-reduced-motion: reduce) {
-    .aurora span { animation: none !important; }
-  }
-
-  .deck { position: relative; width: 100%; height: 100vh; z-index: 1; }
+  .deck { position: relative; width: 100%; height: 100vh; z-index: 1; counter-reset: slidenum -1; }
 
   .slide {
     position: absolute;
@@ -83,68 +70,51 @@
     max-width: 1180px;
     margin: 0 auto;
     right: 0;
+    counter-increment: slidenum;
   }
+  .slide::after {
+    content: counter(slidenum, decimal-leading-zero);
+    position: absolute;
+    left: 40px;
+    bottom: 18px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 84px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.04);
+    letter-spacing: -3px;
+    pointer-events: none;
+  }
+  .slide > * { position: relative; z-index: 1; }
 
   .slide.active { opacity: 1; pointer-events: auto; }
-  .slide.hero { justify-content: center; }
+  .slide.layout-hero, .slide.layout-statement, .slide.layout-quote { justify-content: center; }
 
   /* Nav */
   .nav {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    z-index: 100;
-    background: rgba(20,21,31,0.72);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid var(--border);
-    border-radius: 40px;
-    padding: 9px 20px;
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 16px; z-index: 100;
+    background: rgba(20,21,31,0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--border); border-radius: 40px; padding: 9px 20px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.4);
   }
   .nav-btn {
-    background: none;
-    border: 1px solid rgba(255,255,255,0.16);
-    color: var(--ink-dim);
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transition: all 0.2s;
+    background: none; border: 1px solid rgba(255,255,255,0.16); color: var(--ink-dim);
+    width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s;
   }
   .nav-btn:hover { background: rgba(255,255,255,0.08); color: var(--ink); border-color: var(--violet); }
   .nav-btn:disabled { opacity: 0.3; cursor: default; }
   .nav-dots { display: flex; gap: 6px; }
-  .nav-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.18);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.18); cursor: pointer; transition: all 0.2s; }
   .nav-dot.active { background: var(--violet); box-shadow: 0 0 10px var(--violet); width: 16px; border-radius: 4px; }
   .nav-counter { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-faint); font-weight: 500; min-width: 48px; text-align: center; }
 
-  /* Typography */
+  /* Tags */
   .tags { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
   .tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    padding: 5px 11px 5px 9px;
-    border-radius: 20px;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 5px 11px 5px 9px; border-radius: 20px;
     border: 1px solid color-mix(in srgb, var(--tag) 55%, transparent);
     background: color-mix(in srgb, var(--tag) 14%, transparent);
     color: color-mix(in srgb, var(--tag) 85%, white);
@@ -152,120 +122,102 @@
   .tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--tag); box-shadow: 0 0 8px var(--tag); }
 
   h1 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 52px;
-    font-weight: 700;
-    letter-spacing: -1px;
-    line-height: 1.08;
-    margin-bottom: 20px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 52px; font-weight: 700; letter-spacing: -1px; line-height: 1.08; margin-bottom: 20px;
     background: linear-gradient(120deg, #ffffff 0%, var(--violet) 55%, var(--gold) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  h2 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 29px;
-    font-weight: 700;
-    color: var(--ink);
-    letter-spacing: -0.3px;
-    margin-bottom: 20px;
-  }
+  h2 { font-family: 'Space Grotesk', sans-serif; font-size: 29px; font-weight: 700; color: var(--ink); letter-spacing: -0.3px; margin-bottom: 20px; }
+  h2.tight { margin-bottom: 8px; }
 
-  .subtitle {
-    font-size: 16.5px;
-    color: var(--ink-dim);
-    line-height: 1.65;
-    max-width: 760px;
-    margin-bottom: 28px;
-  }
+  .subtitle { font-size: 16.5px; color: var(--ink-dim); line-height: 1.65; max-width: 760px; margin-bottom: 28px; }
   .meta { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--ink-faint); margin-top: 34px; letter-spacing: 0.3px; }
 
   .detail-items { list-style: none; padding: 0; }
-  .detail-items li {
-    color: #d7d4e0;
-    padding: 6px 0 6px 20px;
-    position: relative;
-    font-size: 15.5px;
-    line-height: 1.68;
-  }
-  .detail-items li::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 16px;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--violet);
-    box-shadow: 0 0 6px var(--violet);
-  }
+  .detail-items li { color: #d7d4e0; padding: 6px 0 6px 20px; position: relative; font-size: 15.5px; line-height: 1.68; }
+  .detail-items li::before { content: ''; position: absolute; left: 0; top: 16px; width: 6px; height: 6px; border-radius: 50%; background: var(--violet); box-shadow: 0 0 6px var(--violet); }
   .detail-items li strong { color: var(--ink); font-weight: 600; }
+  .detail-items.tight li { font-size: 14px; padding: 4px 0 4px 16px; }
 
   .bigword { font-family: 'Space Grotesk', sans-serif; font-size: 25px; font-weight: 600; color: var(--ink); line-height: 1.5; max-width: 900px; }
   .bigword em { color: var(--gold); font-style: normal; }
 
   table.equiv { width: 100%; max-width: 1040px; border-collapse: collapse; margin: 8px 0; font-size: 14px; }
-  table.equiv th {
-    text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px;
-    color: var(--ink-faint); font-weight: 600; padding: 10px 14px;
-    border-bottom: 1px solid var(--border);
-  }
+  table.equiv th { text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-faint); font-weight: 600; padding: 10px 14px; border-bottom: 1px solid var(--border); }
   table.equiv td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #cfccdb; vertical-align: top; line-height: 1.55; }
   table.equiv td:first-child { font-weight: 600; color: var(--ink); }
   table.equiv tr:last-child td { border-bottom: none; }
 
   .callout {
-    background: var(--glass);
-    backdrop-filter: blur(6px);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--gold);
-    border-radius: 12px;
-    padding: 15px 20px; max-width: 900px; margin-top: 18px;
-    font-size: 14.5px; color: #f0e6cf; font-weight: 500; line-height: 1.6;
+    background: var(--glass); backdrop-filter: blur(6px); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+    border-radius: 12px; padding: 15px 20px; max-width: 900px; margin-top: 18px; font-size: 14.5px; color: #f0e6cf; font-weight: 500; line-height: 1.6;
   }
 
-  .thesis {
-    color: var(--ink);
-    font-size: 21px;
-    font-weight: 600;
-    font-family: 'Space Grotesk', sans-serif;
-    line-height: 1.42;
-    max-width: 920px;
-    margin-bottom: 18px;
+  .thesis { color: var(--ink); font-size: 21px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; line-height: 1.42; max-width: 920px; margin-bottom: 18px; }
+
+  /* ═══ Layout: split (two column) ═══ */
+  .split-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 56px; align-items: start; margin-top: 4px; }
+  .split-lead .thesis { font-size: 23px; margin-bottom: 0; }
+  .split-rule { width: 44px; height: 3px; background: linear-gradient(90deg, var(--violet), var(--gold)); border-radius: 2px; margin-bottom: 20px; }
+
+  /* ═══ Layout: cards (comparison grid) ═══ */
+  .card-grid { display: grid; gap: 18px; margin-top: 10px; position: relative; }
+  .card-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .info-card {
+    background: var(--glass); border: 1px solid var(--border); border-top: 3px solid var(--card-accent, var(--violet));
+    border-radius: 14px; padding: 20px 22px;
   }
+  .info-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .info-card .who { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--ink-faint); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .info-card p { font-size: 13.5px; color: #cfccdb; line-height: 1.6; }
+  .info-card ul { list-style: none; }
+  .info-card li { font-size: 13.5px; color: #cfccdb; line-height: 1.6; padding: 4px 0 4px 14px; position: relative; }
+  .info-card li::before { content: ''; position: absolute; left: 0; top: 11px; width: 5px; height: 5px; border-radius: 50%; background: var(--card-accent, var(--violet)); }
+  .vs-badge {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 40px; height: 40px; border-radius: 50%; background: var(--bg-0); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--gold); letter-spacing: 0.5px;
+    box-shadow: 0 0 0 6px var(--bg-0);
+  }
+
+  /* ═══ Layout: stepper (timeline) ═══ */
+  .stepper { display: flex; gap: 22px; margin-top: 10px; }
+  .stage { flex: 1; padding-top: 26px; position: relative; border-top: 2px solid var(--border); }
+  .stage::before {
+    content: ''; position: absolute; top: -6px; left: 0; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--stage-accent, var(--violet)); box-shadow: 0 0 10px var(--stage-accent, var(--violet));
+  }
+  .stage .num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--stage-accent, var(--violet)); font-weight: 700; margin-bottom: 8px; }
+  .stage h4 { font-family: 'Space Grotesk', sans-serif; font-size: 15.5px; font-weight: 700; color: var(--ink); margin-bottom: 8px; line-height: 1.3; }
+  .stage p { font-size: 13px; color: var(--ink-dim); line-height: 1.55; }
+
+  /* ═══ Layout: quote (pull-quote) ═══ */
+  .quote-mark { font-family: Georgia, serif; font-size: 88px; color: var(--violet); opacity: 0.55; line-height: 0.6; margin-bottom: 12px; }
+  .pull-quote { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 600; line-height: 1.4; max-width: 880px; color: var(--ink); margin-bottom: 22px; }
+  .pull-quote .accent { color: var(--gold); }
+
+  /* ═══ Layout: colophon ═══ */
+  .colophon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 8px; }
+  .colophon-card { border: 1px solid var(--border); border-radius: 14px; padding: 22px 20px; background: var(--glass); }
+  .colophon-card .role { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin-bottom: 10px; }
+  .colophon-card .name { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+  .colophon-card p { font-size: 13px; color: var(--ink-dim); line-height: 1.55; }
 
   /* ═══ DOC MODE ═══ */
   .mode-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 200;
-    background: rgba(20,21,31,0.72);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
-    color: var(--ink-dim);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11.5px;
-    font-weight: 600;
-    padding: 9px 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    user-select: none;
-    letter-spacing: 0.4px;
+    position: fixed; top: 20px; right: 20px; z-index: 200;
+    background: rgba(20,21,31,0.72); backdrop-filter: blur(10px); border: 1px solid var(--border); color: var(--ink-dim);
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 600; padding: 9px 15px; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s; user-select: none; letter-spacing: 0.4px;
   }
   .mode-toggle:hover { background: rgba(255,255,255,0.08); color: var(--ink); border-color: var(--violet); }
 
   body.print-mode { overflow: auto; height: auto; }
   body.print-mode .deck { height: auto; }
   body.print-mode .slide {
-    position: static;
-    opacity: 1;
-    pointer-events: auto;
-    height: auto;
-    min-height: 0;
-    padding: 56px 76px;
-    border-bottom: 1px solid var(--border);
-    transition: none;
+    position: static; opacity: 1; pointer-events: auto; height: auto; min-height: 0;
+    padding: 56px 76px; border-bottom: 1px solid var(--border); transition: none;
   }
   body.print-mode .slide:last-child { border-bottom: none; }
   body.print-mode .nav { display: none; }
@@ -275,27 +227,20 @@
     h1 { font-size: 34px; }
     h2 { font-size: 22px; }
     .thesis { font-size: 18px; }
+    .split-grid, .card-grid.cols-2, .card-grid.cols-3, .colophon-grid { grid-template-columns: 1fr; }
+    .stepper { flex-direction: column; gap: 18px; }
+    .vs-badge { display: none; }
   }
 
   @media print {
     body { overflow: auto !important; height: auto !important; background: #fff !important; color: #111 !important; }
     .aurora, .nav, .mode-toggle { display: none !important; }
+    .slide::after { display: none !important; }
     .deck { height: auto !important; }
-    .slide {
-      position: static !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-      height: auto !important;
-      min-height: 0 !important;
-      transition: none !important;
-      page-break-inside: avoid;
-      break-inside: avoid;
-      page-break-after: always;
-      break-after: page;
-    }
+    .slide { position: static !important; opacity: 1 !important; pointer-events: auto !important; height: auto !important; min-height: 0 !important; transition: none !important; page-break-inside: avoid; break-inside: avoid; page-break-after: always; break-after: page; }
     h1 { -webkit-text-fill-color: #111; background: none; color: #111 !important; }
-    .thesis, h2 { color: #111 !important; }
-    .detail-items li, table.equiv td { color: #222 !important; }
+    .thesis, h2, .pull-quote { color: #111 !important; }
+    .detail-items li, table.equiv td, .info-card p, .info-card li, .stage p { color: #222 !important; }
     .callout { background: #f4f4f4 !important; color: #222 !important; border-color: #ccc !important; }
   }
 </style>
@@ -307,7 +252,7 @@
 <div class="deck">
 
   <!-- 0: Hero -->
-  <div class="slide hero active" data-slide="0">
+  <div class="slide layout-hero active" data-slide="0">
     <h1>AI Engineer World&rsquo;s Fair 2026:<br>field notes, remixed</h1>
     <div class="subtitle">Nine threads pulled from four days in San Francisco &mdash; loops, harness design, Google&rsquo;s latest, open-weight models, hardware, browser agents, model routing, and a few voice-agent lessons. Curated and rewritten by Siddharth Tayi, with several ideas drawn from Ayush Joshi&rsquo;s and Joe Dean&rsquo;s original knowledge-share deck.</div>
     <div class="tags">
@@ -324,16 +269,16 @@
     <div class="meta">RealPage &middot; IT &mdash; BEST &middot; San Francisco, Jun 29&ndash;Jul 2, 2026</div>
   </div>
 
-  <!-- 1: Harness thesis -->
-  <div class="slide" data-slide="1">
+  <!-- 1: Harness thesis (statement) -->
+  <div class="slide layout-statement" data-slide="1">
     <div class="tags"><span class="tag" style="--tag:var(--c-harness)">Harness</span></div>
     <h2>The question changed: not which model, but which harness</h2>
     <div class="bigword">Last year the industry argued about <em>which model</em>. This year nobody argued about models &mdash; the whole conference argued about <em>the harness</em>: how you plan, loop, verify, and govern the agents that models power.</div>
     <div class="bigword" style="margin-top:24px;">And the sharpest debate underneath it &mdash; lights-off software factories vs. humans conducting orchestras &mdash; landed on the orchestra: a human orchestrating and reviewing the agents, never stepping out of the loop.</div>
   </div>
 
-  <!-- 2: Loops -->
-  <div class="slide" data-slide="2">
+  <!-- 2: Loops (list) -->
+  <div class="slide layout-list" data-slide="2">
     <div class="tags"><span class="tag" style="--tag:var(--c-loops)">Loops</span></div>
     <h2>Loops that survive real codebases</h2>
     <ul class="detail-items">
@@ -345,35 +290,43 @@
     <div class="callout">The strongest production loops already look like control systems, not chat sessions &mdash; a one-open-PR gate and a version-controlled feedback file are the upgrade worth stealing.</div>
   </div>
 
-  <!-- 3: Harness / Ayush -->
-  <div class="slide" data-slide="3">
+  <!-- 3: Harness / Ayush (stepper) -->
+  <div class="slide layout-stepper" data-slide="3">
     <div class="tags"><span class="tag" style="--tag:var(--c-harness)">Harness</span></div>
-    <h2>The durable product is the harness around the model</h2>
-    <div class="thesis">Traces, evals, diagnosis, bounded auto-fix, and a closed improvement loop convert real failures into reusable system knowledge.</div>
-    <ul class="detail-items">
-      <li><strong>Observe:</strong> traces preserve the context, path, tool calls, cost, latency, and outcome.</li>
-      <li><strong>Diagnose:</strong> failures are classified as model, context, tool, policy, orchestration, or UX defects.</li>
-      <li><strong>Codify:</strong> the fix becomes an eval, deterministic check, skill, policy, or runtime change.</li>
-      <li><strong>Verify:</strong> the new contract is tested before the loop is allowed to expand autonomy.</li>
-    </ul>
+    <h2 class="tight">The durable product is the harness around the model</h2>
+    <div class="thesis" style="font-size:16px; color:var(--ink-dim); font-family:'Inter',sans-serif; font-weight:500;">Traces, evals, diagnosis, bounded auto-fix, and a closed improvement loop convert real failures into reusable system knowledge.</div>
+    <div class="stepper" style="--stage-accent:var(--c-harness);">
+      <div class="stage"><div class="num">01</div><h4>Observe</h4><p>Traces preserve the context, path, tool calls, cost, latency, and outcome.</p></div>
+      <div class="stage"><div class="num">02</div><h4>Diagnose</h4><p>Failures are classified as model, context, tool, policy, orchestration, or UX defects.</p></div>
+      <div class="stage"><div class="num">03</div><h4>Codify</h4><p>The fix becomes an eval, deterministic check, skill, policy, or runtime change.</p></div>
+      <div class="stage"><div class="num">04</div><h4>Verify</h4><p>The new contract is tested before the loop is allowed to expand autonomy.</p></div>
+    </div>
     <div class="callout"><strong>Value:</strong> usage makes the platform more reliable instead of generating the same incident at higher volume. <strong>Failure mode:</strong> without this loop, more autonomy only accelerates repeat mistakes.</div>
   </div>
 
-  <!-- 4: Google / Open weights -->
-  <div class="slide" data-slide="4">
+  <!-- 4: Google / Open weights (cards) -->
+  <div class="slide layout-cards" data-slide="4">
     <div class="tags">
       <span class="tag" style="--tag:var(--c-google)">Google</span>
       <span class="tag" style="--tag:var(--c-openweights)">Open weights</span>
     </div>
     <h2>Inside Google, and the open-weights front</h2>
-    <ul class="detail-items">
-      <li><strong>Google DeepMind:</strong> the new <strong>Interactions API</strong> &mdash; one unified call for models <em>and</em> agents, server-side state, sandboxes, background execution; explicitly moving past turn-based chat.</li>
-      <li><strong>Z.ai&rsquo;s GLM-5.2 keynote:</strong> open-weight frontier models &ldquo;built for long-horizon tasks&rdquo; keep the routing/cost conversation alive &mdash; and set up the local/open-weight thread the rest of this deck follows.</li>
-    </ul>
+    <div class="card-grid cols-2">
+      <div class="info-card" style="--card-accent:var(--c-google);">
+        <h3>Interactions API</h3>
+        <div class="who">Google DeepMind</div>
+        <p>One unified call for models <em>and</em> agents &mdash; server-side state, sandboxes, background execution. Explicitly moving past turn-based chat.</p>
+      </div>
+      <div class="info-card" style="--card-accent:var(--c-openweights);">
+        <h3>GLM-5.2 keynote</h3>
+        <div class="who">Z.ai</div>
+        <p>Open-weight frontier models &ldquo;built for long-horizon tasks&rdquo; &mdash; keeping the routing/cost conversation alive, and setting up the local/open-weight thread the rest of this deck follows.</p>
+      </div>
+    </div>
   </div>
 
-  <!-- 5: Model routing / Ayush -->
-  <div class="slide" data-slide="5">
+  <!-- 5: Model routing / Ayush (list) -->
+  <div class="slide layout-list" data-slide="5">
     <div class="tags"><span class="tag" style="--tag:var(--c-routing)">Model routing</span></div>
     <h2>The right model is the smallest one that meets the quality bar</h2>
     <div class="thesis">Model choice and serving architecture work together. A smaller, task-fit model on an inference-optimized platform can improve latency, cost, and throughput without sacrificing the outcome.</div>
@@ -385,36 +338,54 @@
     <div class="callout"><strong>Decision:</strong> use the smallest model that clears the evals on an optimized serving platform. Add model capability or infrastructure control only when quality, privacy, or the SLO requires it.</div>
   </div>
 
-  <!-- 6: Voice 1 / Ayush -->
-  <div class="slide" data-slide="6">
+  <!-- 6: Voice 1 / Ayush (split) -->
+  <div class="slide layout-split" data-slide="6">
     <div class="tags"><span class="tag" style="--tag:var(--c-voice)">Voice</span></div>
-    <h2>Voice is the stress test for the entire agent architecture</h2>
-    <div class="thesis">Voice is not an audio wrapper around chat. It is a realtime agent runtime that exposes every weakness in state, latency, tools, and recovery.</div>
-    <ul class="detail-items">
-      <li><strong>Conversation mechanics:</strong> turn detection, interruption, silence, noise, and full-duplex behavior decide whether the system feels human or broken.</li>
-      <li><strong>Runtime state:</strong> policy, context, tools, UI state, and long-running tasks must continue changing while someone speaks.</li>
-      <li><strong>Latency is a budget:</strong> speech recognition, end-of-turn detection, model work, tools, and speech generation all spend from the same experience budget.</li>
-      <li><strong>Correctness is observable behavior:</strong> did the tool complete, did the user hear the right status, and did the system escalate cleanly?</li>
-    </ul>
-    <div class="callout"><strong>Required evals:</strong> interruption recovery, end-of-turn to first audio, tool completion, state consistency, and escalation &mdash; at p50 and tail latency.</div>
+    <div class="split-grid">
+      <div class="split-lead">
+        <div class="split-rule"></div>
+        <h2>Voice is the stress test for the entire agent architecture</h2>
+        <div class="thesis">Voice is not an audio wrapper around chat. It is a realtime agent runtime that exposes every weakness in state, latency, tools, and recovery.</div>
+      </div>
+      <div class="split-body">
+        <ul class="detail-items">
+          <li><strong>Conversation mechanics:</strong> turn detection, interruption, silence, noise, and full-duplex behavior decide whether the system feels human or broken.</li>
+          <li><strong>Runtime state:</strong> policy, context, tools, UI state, and long-running tasks must continue changing while someone speaks.</li>
+          <li><strong>Latency is a budget:</strong> speech recognition, end-of-turn detection, model work, tools, and speech generation all spend from the same experience budget.</li>
+          <li><strong>Correctness is observable behavior:</strong> did the tool complete, did the user hear the right status, and did the system escalate cleanly?</li>
+        </ul>
+        <div class="callout"><strong>Required evals:</strong> interruption recovery, end-of-turn to first audio, tool completion, state consistency, and escalation &mdash; at p50 and tail latency.</div>
+      </div>
+    </div>
   </div>
 
-  <!-- 7: Voice 2 / Ayush -->
-  <div class="slide" data-slide="7">
+  <!-- 7: Voice 2 / Ayush (cards, 3-way) -->
+  <div class="slide layout-cards" data-slide="7">
     <div class="tags"><span class="tag" style="--tag:var(--c-voice)">Voice</span></div>
-    <h2>There is no single voice stack</h2>
-    <div class="thesis">The architecture determines what we can optimize, inspect, and control. The right choice depends on the workflow&rsquo;s risk &mdash; not which demo sounds most human.</div>
-    <table class="equiv">
-      <tr><th>Architecture</th><th>Strength</th><th>Tradeoff</th></tr>
-      <tr><td>Cascaded<br><span style="color:var(--ink-faint)">speech &rarr; text &rarr; reasoning &rarr; speech</span></td><td>Modular, inspectable, and easier to connect to tools, policy, and existing text agents</td><td>Every stage adds latency; transcription can discard tone, timing, and ambiguity</td></tr>
-      <tr><td>Speech-to-speech</td><td>Lower-latency, expressive interaction with more natural timing and prosody</td><td>Harder to inspect, govern, ground in tools, and explain when behavior fails</td></tr>
-      <tr><td>Hybrid production stack</td><td>Speech-native interaction with explicit state, tools, policy checks, and verification</td><td>More orchestration, but control and naturalness can be tuned independently</td></tr>
-    </table>
+    <h2 class="tight">There is no single voice stack</h2>
+    <div class="thesis" style="font-size:16px; color:var(--ink-dim); font-family:'Inter',sans-serif; font-weight:500;">The architecture determines what we can optimize, inspect, and control &mdash; the right choice depends on the workflow&rsquo;s risk, not which demo sounds most human.</div>
+    <div class="card-grid cols-3">
+      <div class="info-card" style="--card-accent:var(--c-voice);">
+        <h3>Cascaded</h3>
+        <div class="who">speech &rarr; text &rarr; reasoning &rarr; speech</div>
+        <p>Modular, inspectable, and easier to connect to tools, policy, and existing text agents. Every stage adds latency; transcription can discard tone and ambiguity.</p>
+      </div>
+      <div class="info-card" style="--card-accent:var(--c-voice);">
+        <h3>Speech-to-speech</h3>
+        <div class="who">direct audio-to-audio</div>
+        <p>Lower-latency, expressive interaction with natural timing and prosody. Harder to inspect, govern, ground in tools, and explain when behavior fails.</p>
+      </div>
+      <div class="info-card" style="--card-accent:var(--c-voice);">
+        <h3>Hybrid stack</h3>
+        <div class="who">production default</div>
+        <p>Speech-native interaction with explicit state, tools, policy checks, and verification. More orchestration, but control and naturalness tune independently.</p>
+      </div>
+    </div>
     <div class="callout"><strong>Decision rule:</strong> use the simplest architecture that meets both the interaction SLO and the workflow&rsquo;s control requirements.</div>
   </div>
 
-  <!-- 8: Voice 3 / Ayush -->
-  <div class="slide" data-slide="8">
+  <!-- 8: Voice 3 / Ayush (list) -->
+  <div class="slide layout-list" data-slide="8">
     <div class="tags"><span class="tag" style="--tag:var(--c-voice)">Voice</span></div>
     <h2>Humanlike behavior is a system metric, not a model benchmark</h2>
     <div class="thesis">Users experience one delay, but the budget is spent across end-of-turn detection, recognition, reasoning, tools, speech generation, and the network.</div>
@@ -427,8 +398,8 @@
     <div class="callout"><strong>Minimum scorecard:</strong> end-of-turn to first audio, interruption recovery, false-cutoff rate, task completion, state consistency, escalation quality, and cost per completed outcome.</div>
   </div>
 
-  <!-- 9: Google overview / Siddharth -->
-  <div class="slide" data-slide="9">
+  <!-- 9: Google overview / Siddharth (list) -->
+  <div class="slide layout-list" data-slide="9">
     <div class="tags"><span class="tag" style="--tag:var(--c-google)">Google</span></div>
     <h2>Gemini 3.1 raises the bar on OCR, audio, video, and latency</h2>
     <div class="thesis">Gemini 3.1 reads less like an incremental update and more like a step-change across every multimodal fundamental &mdash; and it sits inside a DeepMind research mission that reaches well past chatbots.</div>
@@ -440,54 +411,76 @@
     </ul>
   </div>
 
-  <!-- 10: Gemini vs Gemma / Siddharth -->
-  <div class="slide" data-slide="10">
+  <!-- 10: Gemini vs Gemma / Siddharth (cards, head-to-head) -->
+  <div class="slide layout-cards" data-slide="10">
     <div class="tags"><span class="tag" style="--tag:var(--c-google)">Google</span></div>
-    <h2>Gemini 3.1 Flash and Gemma are close &mdash; except on video</h2>
-    <div class="thesis">Gemma shadows Gemini 3.1 Flash closely on quality; the real divergence shows up in just two tasks.</div>
-    <table class="equiv">
-      <tr><th>Task</th><th>Gemini 3.1 Flash</th><th>Gemma</th></tr>
-      <tr><td>Video</td><td>Best of the two &mdash; the clearer pick for video-heavy work</td><td>Very similar, but Flash still wins here</td></tr>
-      <tr><td>Language translation</td><td>Superior &mdash; supports far more languages</td><td>Good, but a narrower set of supported languages</td></tr>
-    </table>
+    <h2 class="tight">Gemini 3.1 Flash and Gemma are close &mdash; except on video</h2>
+    <div class="thesis" style="font-size:16px; color:var(--ink-dim); font-family:'Inter',sans-serif; font-weight:500;">Gemma shadows Gemini 3.1 Flash closely on quality; the real divergence shows up in just two tasks.</div>
+    <div class="card-grid cols-2">
+      <div class="info-card" style="--card-accent:var(--c-google);">
+        <h3>Gemini 3.1 Flash</h3>
+        <div class="who">cloud flagship</div>
+        <ul>
+          <li>Best of the two on video &mdash; the clearer pick for video-heavy work</li>
+          <li>Superior language translation &mdash; supports far more languages</li>
+        </ul>
+      </div>
+      <div class="vs-badge">VS</div>
+      <div class="info-card" style="--card-accent:var(--c-gold, var(--gold));">
+        <h3>Gemma</h3>
+        <div class="who">on par almost everywhere</div>
+        <ul>
+          <li>Very similar on video, but Flash still wins here</li>
+          <li>Good translation, but a narrower set of supported languages</li>
+        </ul>
+      </div>
+    </div>
     <div class="callout">Default to <strong>Gemini 3.1 Flash</strong> for video and wide-language translation; <strong>Gemma</strong> earns its keep everywhere else.</div>
   </div>
 
-  <!-- 11: Gemma 4 / Siddharth -->
-  <div class="slide" data-slide="11">
+  <!-- 11: Gemma 4 / Siddharth (split) -->
+  <div class="slide layout-split" data-slide="11">
     <div class="tags">
       <span class="tag" style="--tag:var(--c-google)">Google</span>
       <span class="tag" style="--tag:var(--c-hardware)">Hardware</span>
     </div>
-    <h2>Gemma 4 puts frontier techniques on your phone</h2>
-    <div class="thesis">Google is now shipping models that run on a slice of the phone&rsquo;s own processor and do the job of far larger, machine-hosted models. Gemma 4 is the clearest proof yet: a noticeably faster generation that trades some latency for running fully on-device, while staying on par with Gemini 3.1 on streaming, audio transcription, and overall intelligence.</div>
-    <ul class="detail-items">
-      <li><strong>Advanced reasoning:</strong> configurable thinking modes (chain-of-thought inference) built for complex logic and multi-step planning.</li>
-      <li><strong>Multi-token prediction (MTP):</strong> built-in drafter models predict several future tokens at once, accelerating local inference with no loss in output quality.</li>
-      <li><strong>Native multimodality:</strong> text and images natively; the smaller E2B and E4B variants add native audio for speech recognition and translation; the 12B variant runs visual and audio data directly through the language model, encoder-free.</li>
-      <li><strong>Built for agents:</strong> an intelligence-per-parameter design built natively for multi-step reasoning, multimodal processing, and function calling.</li>
-    </ul>
-    <div class="callout">The booth&rsquo;s best moment: this model running live, on a phone, in the demo &mdash; AI genuinely at your fingertips.</div>
+    <div class="split-grid">
+      <div class="split-lead">
+        <div class="split-rule"></div>
+        <h2>Gemma 4 puts frontier techniques on your phone</h2>
+        <div class="thesis">Google is now shipping models that run on a slice of the phone&rsquo;s own processor and do the job of far larger, machine-hosted models &mdash; while staying on par with Gemini 3.1 on streaming, audio transcription, and overall intelligence.</div>
+        <div class="callout">The booth&rsquo;s best moment: this model running live, on a phone, in the demo &mdash; AI genuinely at your fingertips.</div>
+      </div>
+      <div class="split-body">
+        <ul class="detail-items">
+          <li><strong>Advanced reasoning:</strong> configurable thinking modes (chain-of-thought inference) built for complex logic and multi-step planning.</li>
+          <li><strong>Multi-token prediction (MTP):</strong> built-in drafter models predict several future tokens at once, accelerating local inference with no loss in output quality.</li>
+          <li><strong>Native multimodality:</strong> text and images natively; the smaller E2B and E4B variants add native audio; the 12B variant runs visual and audio data directly through the language model, encoder-free.</li>
+          <li><strong>Built for agents:</strong> an intelligence-per-parameter design built natively for multi-step reasoning, multimodal processing, and function calling.</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
-  <!-- 12: GLM DGX demo / Siddharth -->
-  <div class="slide" data-slide="12">
+  <!-- 12: GLM DGX demo / Siddharth (stepper / timeline) -->
+  <div class="slide layout-stepper" data-slide="12">
     <div class="tags">
       <span class="tag" style="--tag:var(--c-hardware)">Hardware</span>
       <span class="tag" style="--tag:var(--c-openweights)">Open weights</span>
     </div>
-    <h2>GLM 5.2 on DGX Station: frontier intelligence under your desk</h2>
-    <div class="thesis">Frontier-scale intelligence is migrating from the datacenter to the desk, as GPUs and models both get more efficient.</div>
-    <ul class="detail-items">
-      <li><strong>Live demo:</strong> GLM models running on an NVIDIA DGX Station &mdash; Ahmad M. Osman, Founder/CEO, Osmanatic.</li>
-      <li><strong>Near-term roadmap (?):</strong> GLM-class models on a single RTX 5090 (64GB) by mid&ndash;2027, with a further jump by late 2027 &mdash; the exact sequencing wasn&rsquo;t fully clear from the session.</li>
-      <li><strong>The longer arc:</strong> as models get more parameter-efficient, that same capability trickles down to older, lower-tier cards &mdash; RTX 30-series through 50-series &mdash; not just this year&rsquo;s flagship.</li>
-    </ul>
+    <h2 class="tight">GLM 5.2 on DGX Station: frontier intelligence under your desk</h2>
+    <div class="thesis" style="font-size:16px; color:var(--ink-dim); font-family:'Inter',sans-serif; font-weight:500;">Frontier-scale intelligence is migrating from the datacenter to the desk, as GPUs and models both get more efficient. &mdash; Ahmad M. Osman, Founder/CEO, Osmanatic</div>
+    <div class="stepper" style="--stage-accent:var(--c-hardware);">
+      <div class="stage"><div class="num">LIVE</div><h4>DGX Station</h4><p>GLM models demoed running on an NVIDIA DGX Station.</p></div>
+      <div class="stage"><div class="num">MID-2027 (?)</div><h4>RTX 5090</h4><p>GLM-class models on a single 64GB card &mdash; sequencing wasn&rsquo;t fully clear from the session.</p></div>
+      <div class="stage"><div class="num">LATE 2027 (?)</div><h4>Further jump</h4><p>More capability expected on the same class of hardware.</p></div>
+      <div class="stage"><div class="num">THE ARC</div><h4>RTX 30&ndash;50 series</h4><p>As models get more parameter-efficient, capability trickles down to older, lower-tier cards &mdash; not just this year&rsquo;s flagship.</p></div>
+    </div>
     <div class="callout">Hardware efficiency, not just model size, is what determines when frontier intelligence fits under your desk.</div>
   </div>
 
-  <!-- 13: Local LLMs / Siddharth -->
-  <div class="slide" data-slide="13">
+  <!-- 13: Local LLMs / Siddharth (list) -->
+  <div class="slide layout-list" data-slide="13">
     <div class="tags">
       <span class="tag" style="--tag:var(--c-localllms)">Local LLMs</span>
       <span class="tag" style="--tag:var(--c-hardware)">Hardware</span>
@@ -502,21 +495,28 @@
     <div class="callout">Local inference is being pitched as a sustainability story as much as a cost story &mdash; a real counterweight to cloud-only strategy.</div>
   </div>
 
-  <!-- 14: Model routing / Siddharth -->
-  <div class="slide" data-slide="14">
+  <!-- 14: Model routing / Siddharth (split) -->
+  <div class="slide layout-split" data-slide="14">
     <div class="tags"><span class="tag" style="--tag:var(--c-routing)">Model routing</span></div>
-    <h2>Give each agent the model built for its job</h2>
-    <div class="thesis">Stop sending every task to one model. Route by task, and let each sub-agent run the model that&rsquo;s actually strong in that domain.</div>
-    <ul class="detail-items">
-      <li><strong>Domain-tuned sub-agents:</strong> one model fine-tuned toward science, another toward coding &mdash; the platform spins up whichever sub-agent carries the model the task actually needs.</li>
-      <li><strong>Not every agent needs the frontier model:</strong> a reporting agent has no use for the top-of-line model when a much smaller, cheaper one does the job just as well.</li>
-      <li><strong>Model routing, defined:</strong> given a task, the platform selects the right model for it automatically &mdash; no manual wiring required.</li>
-    </ul>
-    <div class="callout">Every agent spun up this way carries its own model, context, memory, and tools: a mini harness in its own right.</div>
+    <div class="split-grid">
+      <div class="split-lead">
+        <div class="split-rule"></div>
+        <h2>Give each agent the model built for its job</h2>
+        <div class="thesis">Stop sending every task to one model. Route by task, and let each sub-agent run the model that&rsquo;s actually strong in that domain.</div>
+        <div class="callout">Every agent spun up this way carries its own model, context, memory, and tools: a mini harness in its own right.</div>
+      </div>
+      <div class="split-body">
+        <ul class="detail-items">
+          <li><strong>Domain-tuned sub-agents:</strong> one model fine-tuned toward science, another toward coding &mdash; the platform spins up whichever sub-agent carries the model the task actually needs.</li>
+          <li><strong>Not every agent needs the frontier model:</strong> a reporting agent has no use for the top-of-line model when a much smaller, cheaper one does the job just as well.</li>
+          <li><strong>Model routing, defined:</strong> given a task, the platform selects the right model for it automatically &mdash; no manual wiring required.</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
-  <!-- 15: Context/cost/cache / Siddharth -->
-  <div class="slide" data-slide="15">
+  <!-- 15: Context/cost/cache / Siddharth (list) -->
+  <div class="slide layout-list" data-slide="15">
     <div class="tags"><span class="tag" style="--tag:var(--c-routing)">Model routing</span></div>
     <h2>Context lives with one model &mdash; cost still has to be earned</h2>
     <div class="thesis">Split work across a main model and smaller task models, and one question dominates: where does the context actually live?</div>
@@ -528,43 +528,54 @@
     </ul>
   </div>
 
-  <!-- 16: Harness evolution / Siddharth -->
-  <div class="slide" data-slide="16">
+  <!-- 16: Harness evolution / Siddharth (stepper) -->
+  <div class="slide layout-stepper" data-slide="16">
     <div class="tags"><span class="tag" style="--tag:var(--c-harness)">Harness</span></div>
-    <h2>From instructions, to agents, to agents on the fly</h2>
-    <div class="thesis">The harness pattern has moved through four stages, each one stripping out a layer of manual setup.</div>
-    <table class="equiv">
-      <tr><th>Stage</th><th>What happens</th></tr>
-      <tr><td>Direct instruction</td><td>You tell Claude or Codex what to do, and it does it &mdash; no persistent agent structure.</td></tr>
-      <tr><td>Agents</td><td>You create an agent and assign it a task, a goal, and a role.</td></tr>
-      <tr><td>Sub-agents</td><td>Sub-agents get created as needed, per request, under a parent agent.</td></tr>
-      <tr><td>Agents on the fly</td><td>You just give Claude context; it spins up the agents it needs on the fly, using the harness already in place.</td></tr>
-    </table>
+    <h2 class="tight">From instructions, to agents, to agents on the fly</h2>
+    <div class="thesis" style="font-size:16px; color:var(--ink-dim); font-family:'Inter',sans-serif; font-weight:500;">The harness pattern has moved through four stages, each one stripping out a layer of manual setup.</div>
+    <div class="stepper" style="--stage-accent:var(--c-harness);">
+      <div class="stage"><div class="num">01</div><h4>Direct instruction</h4><p>Tell Claude or Codex what to do, and it does it &mdash; no persistent agent structure.</p></div>
+      <div class="stage"><div class="num">02</div><h4>Agents</h4><p>Create an agent and assign it a task, a goal, and a role.</p></div>
+      <div class="stage"><div class="num">03</div><h4>Sub-agents</h4><p>Sub-agents get created as needed, per request, under a parent agent.</p></div>
+      <div class="stage"><div class="num">04</div><h4>Agents on the fly</h4><p>Just give Claude context; it spins up the agents it needs, using the harness already in place.</p></div>
+    </div>
     <div class="callout">Context, memory, and session state across this divide-and-conquer mix of models is still the open problem &mdash; the thing every vendor in the room was actively trying to solve.</div>
   </div>
 
-  <!-- 17: Browserbase / Siddharth -->
-  <div class="slide" data-slide="17">
+  <!-- 17: Browserbase / Siddharth (quote) -->
+  <div class="slide layout-quote" data-slide="17">
     <div class="tags"><span class="tag" style="--tag:var(--c-browser)">Browser agents</span></div>
-    <h2>Browser agents: a small-world moment at the Browserbase booth</h2>
-    <div class="thesis">Browserbase builds browser-based agents &mdash; and it&rsquo;s already the tool my own team runs on a live RealPage project. Met their sales engineer at the booth: small world.</div>
-    <ul class="detail-items">
+    <div class="quote-mark">&ldquo;</div>
+    <div class="pull-quote">Browserbase builds browser-based agents &mdash; and it&rsquo;s already the tool <span class="accent">my own team runs</span> on a live RealPage project. Met their sales engineer at the booth: small world.</div>
+    <ul class="detail-items tight">
       <li><strong>Already in production here:</strong> Browserbase is running today on one of my team&rsquo;s RealPage projects.</li>
       <li><strong>Prior art:</strong> I built a browser agent at a previous company that pulled tax data from county websites and ran OCR on it &mdash; the same shape of problem RealPage is solving now.</li>
-      <li><strong>LLMs &rarr; LAMs:</strong> the same trajectory that turned a chat model into a working tax-scraping OCR agent is now a supported category &mdash; browser-based <strong>language action models (LAMs)</strong> &mdash; instead of something every team builds from scratch.</li>
+      <li><strong>LLMs &rarr; LAMs:</strong> the same trajectory that turned a chat model into a working tax-scraping OCR agent is now a supported category &mdash; browser-based <strong>language action models</strong> &mdash; instead of something every team builds from scratch.</li>
     </ul>
   </div>
 
   <!-- 18: Colophon -->
-  <div class="slide" data-slide="18">
+  <div class="slide layout-colophon" data-slide="18">
     <div class="tags"><span class="tag" style="--tag:var(--c-harness)">Colophon</span></div>
     <h2>Notes, remixed</h2>
     <div class="subtitle" style="max-width:820px;">This page is a curated, redesigned remix of a longer knowledge-share deck &mdash; nine threads pulled out of 26 sessions across four days at AI Engineer World&rsquo;s Fair 2026.</div>
-    <ul class="detail-items">
-      <li>Original knowledge-share deck and several synthesis slides &mdash; <strong>Joe Dean</strong>, AI Internal Enablement.</li>
-      <li>Model-routing, harness, and voice synthesis slides &mdash; <strong>Ayush Joshi</strong>, External AI Lead Engineer.</li>
-      <li>Curation, redesign, and the Google / hardware / local LLM / browser-agent / model-routing notes &mdash; <strong>Siddharth Tayi</strong>, IT &mdash; BEST.</li>
-    </ul>
+    <div class="colophon-grid">
+      <div class="colophon-card">
+        <div class="role">Original deck</div>
+        <div class="name">Joe Dean</div>
+        <p>AI Internal Enablement. Original knowledge-share deck and several synthesis slides.</p>
+      </div>
+      <div class="colophon-card">
+        <div class="role">Synthesis slides</div>
+        <div class="name">Ayush Joshi</div>
+        <p>External AI Lead Engineer. Model-routing, harness, and voice synthesis slides.</p>
+      </div>
+      <div class="colophon-card">
+        <div class="role">This remix</div>
+        <div class="name">Siddharth Tayi</div>
+        <p>IT &mdash; BEST. Curation, redesign, and the Google / hardware / local LLM / browser-agent / model-routing notes.</p>
+      </div>
+    </div>
     <div class="meta">AI Engineer World&rsquo;s Fair 2026 &middot; San Francisco &middot; Jun 29&ndash;Jul 2</div>
   </div>
 
