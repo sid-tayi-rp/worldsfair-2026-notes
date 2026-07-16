@@ -6,29 +6,18 @@
 <title>AI Engineer World&rsquo;s Fair 2026 &mdash; Field Notes, Remixed</title>
 <meta name="description" content="A curated, redesigned highlight reel from AI Engineer World's Fair 2026 — loops, harness design, Google, open-weight models, hardware, browser agents, model routing, and voice — by Siddharth Tayi.">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,680;1,500;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg-0: #06070b;
-    --ink: #f3f0ea;
-    --ink-dim: #aba7ba;
-    --ink-faint: #6e6b7d;
-    --violet: #a78bfa;
-    --gold: #f3b969;
-    --glass: rgba(255,255,255,0.045);
-    --border: rgba(255,255,255,0.10);
-
-    --c-harness: #a78bfa;
-    --c-loops: #2dd4bf;
-    --c-google: #60a5fa;
-    --c-openweights: #34d399;
-    --c-hardware: #fb7185;
-    --c-localllms: #fbbf24;
-    --c-routing: #22d3ee;
-    --c-voice: #f472b6;
-    --c-browser: #fb923c;
+    --bg-0: #08090d;
+    --ink: #f2efe8;
+    --ink-dim: #a7a3b3;
+    --ink-faint: #6b687a;
+    --gold: #eec080;
+    --border: rgba(255,255,255,0.09);
+    --accent-live: #a78bfa;
   }
 
   html, body { height: 100%; }
@@ -42,244 +31,230 @@
     position: relative;
   }
 
-  /* Aurora background */
-  .aurora { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-  .aurora span { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.35; will-change: transform; }
-  .aurora .a1 { width: 620px; height: 620px; background: var(--violet); top: -220px; left: -160px; animation: drift1 34s ease-in-out infinite; }
-  .aurora .a2 { width: 560px; height: 560px; background: var(--gold); bottom: -220px; right: -140px; opacity: 0.22; animation: drift2 40s ease-in-out infinite; }
-  .aurora .a3 { width: 420px; height: 420px; background: #2dd4bf; top: 40%; right: 8%; opacity: 0.14; animation: drift3 46s ease-in-out infinite; }
-  @keyframes drift1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(60px, 40px); } }
-  @keyframes drift2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-50px, -60px); } }
-  @keyframes drift3 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-40px, 50px); } }
-  @media (prefers-reduced-motion: reduce) { .aurora span { animation: none !important; } }
+  /* Ambient color wash — crossfades per slide's topic tint */
+  .ambient {
+    position: fixed; inset: 0; z-index: 0; opacity: 0;
+    transition: opacity 1.1s ease;
+    pointer-events: none;
+  }
 
-  .deck { position: relative; width: 100%; height: 100vh; z-index: 1; counter-reset: slidenum -1; }
+  .rail {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 104px; z-index: 150;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    padding: 30px 0 24px;
+    background: linear-gradient(180deg, rgba(8,9,13,0.55), rgba(8,9,13,0.28));
+    border-right: 1px solid var(--border);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  .rail-top { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .rail-index { font-family: 'JetBrains Mono', monospace; font-size: 23px; font-weight: 700; color: var(--ink); letter-spacing: -0.5px; }
+  .rail-total { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--ink-faint); }
+  .rail-track { position: relative; width: 2px; flex: 1; background: rgba(255,255,255,0.08); margin: 22px 0; border-radius: 2px; overflow: hidden; }
+  .rail-fill { position: absolute; top: 0; left: 0; width: 100%; height: 0%; border-radius: 2px; background: var(--accent-live); transition: height 0.5s ease, background 0.6s ease; }
+  .rail-topic {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--accent-live); margin: 16px 0; white-space: nowrap; transition: color 0.6s ease;
+  }
+  .rail-nav { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .rail-btn {
+    width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.02); color: var(--ink-dim);
+    display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 14px;
+  }
+  .rail-btn:hover { border-color: var(--ink); color: var(--ink); background: rgba(255,255,255,0.07); }
+  .rail-btn:disabled { opacity: 0.22; cursor: default; }
+
+  .deck { position: absolute; top: 0; left: 104px; right: 0; bottom: 0; z-index: 1; }
 
   .slide {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100vh;
-    padding: 64px 76px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s ease;
-    max-width: 1180px;
-    margin: 0 auto;
-    right: 0;
-    counter-increment: slidenum;
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    padding: 60px 8% 60px 6%;
+    display: flex; flex-direction: column; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.55s ease;
+    max-width: 1100px;
   }
-  .slide::after {
-    content: counter(slidenum, decimal-leading-zero);
-    position: absolute;
-    left: 40px;
-    bottom: 18px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 84px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.04);
-    letter-spacing: -3px;
-    pointer-events: none;
-  }
-  .slide > * { position: relative; z-index: 1; }
-
   .slide.active { opacity: 1; pointer-events: auto; }
   .slide.layout-hero, .slide.layout-statement, .slide.layout-quote { justify-content: center; }
 
-  /* Nav */
-  .nav {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    display: flex; align-items: center; gap: 16px; z-index: 100;
-    background: rgba(20,21,31,0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    border: 1px solid var(--border); border-radius: 40px; padding: 9px 20px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-  }
-  .nav-btn {
-    background: none; border: 1px solid rgba(255,255,255,0.16); color: var(--ink-dim);
-    width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s;
-  }
-  .nav-btn:hover { background: rgba(255,255,255,0.08); color: var(--ink); border-color: var(--violet); }
-  .nav-btn:disabled { opacity: 0.3; cursor: default; }
-  .nav-dots { display: flex; gap: 6px; }
-  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.18); cursor: pointer; transition: all 0.2s; }
-  .nav-dot.active { background: var(--violet); box-shadow: 0 0 10px var(--violet); width: 16px; border-radius: 4px; }
-  .nav-counter { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-faint); font-weight: 500; min-width: 48px; text-align: center; }
-
-  /* Tags */
-  .tags { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  /* Kicker tags — flat, editorial, no pill/box */
+  .tags { display: flex; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; align-items: center; }
   .tag {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
-    padding: 5px 11px 5px 9px; border-radius: 20px;
-    border: 1px solid color-mix(in srgb, var(--tag) 55%, transparent);
-    background: color-mix(in srgb, var(--tag) 14%, transparent);
-    color: color-mix(in srgb, var(--tag) 85%, white);
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: color-mix(in srgb, var(--tag) 82%, white);
   }
-  .tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--tag); box-shadow: 0 0 8px var(--tag); }
+  .tag::before { content: ''; width: 9px; height: 9px; background: var(--tag); flex-shrink: 0; }
 
   h1 {
-    font-family: 'Space Grotesk', sans-serif; font-size: 52px; font-weight: 700; letter-spacing: -1px; line-height: 1.08; margin-bottom: 20px;
-    background: linear-gradient(120deg, #ffffff 0%, var(--violet) 55%, var(--gold) 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
+    font-family: 'Fraunces', serif; font-size: 56px; font-weight: 600; font-style: normal;
+    letter-spacing: -1px; line-height: 1.06; margin-bottom: 22px; color: var(--ink);
   }
-  h2 { font-family: 'Space Grotesk', sans-serif; font-size: 29px; font-weight: 700; color: var(--ink); letter-spacing: -0.3px; margin-bottom: 20px; }
-  h2.tight { margin-bottom: 8px; }
+  h1 em { font-style: italic; font-weight: 500; color: var(--gold); }
+  h2 {
+    font-family: 'Fraunces', serif; font-size: 30px; font-weight: 600; color: var(--ink);
+    letter-spacing: -0.3px; line-height: 1.2; margin-bottom: 20px;
+  }
+  h2.tight { margin-bottom: 10px; }
 
-  .subtitle { font-size: 16.5px; color: var(--ink-dim); line-height: 1.65; max-width: 760px; margin-bottom: 28px; }
-  .meta { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--ink-faint); margin-top: 34px; letter-spacing: 0.3px; }
+  .subtitle { font-size: 16.5px; color: var(--ink-dim); line-height: 1.7; max-width: 700px; margin-bottom: 30px; }
+  .meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-faint); margin-top: 36px; letter-spacing: 0.4px; }
 
   .detail-items { list-style: none; padding: 0; }
-  .detail-items li { color: #d7d4e0; padding: 6px 0 6px 20px; position: relative; font-size: 15.5px; line-height: 1.68; }
-  .detail-items li::before { content: ''; position: absolute; left: 0; top: 16px; width: 6px; height: 6px; border-radius: 50%; background: var(--violet); box-shadow: 0 0 6px var(--violet); }
+  .detail-items li { color: #d8d4e2; padding: 7px 0 7px 22px; position: relative; font-size: 15.5px; line-height: 1.7; }
+  .detail-items li::before { content: '\2014'; position: absolute; left: 0; top: 6px; color: var(--ink-faint); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
   .detail-items li strong { color: var(--ink); font-weight: 600; }
-  .detail-items.tight li { font-size: 14px; padding: 4px 0 4px 16px; }
+  .detail-items.tight li { font-size: 14px; padding: 5px 0 5px 20px; }
 
-  .bigword { font-family: 'Space Grotesk', sans-serif; font-size: 25px; font-weight: 600; color: var(--ink); line-height: 1.5; max-width: 900px; }
-  .bigword em { color: var(--gold); font-style: normal; }
+  .bigword { font-family: 'Fraunces', serif; font-weight: 500; font-size: 27px; color: var(--ink); line-height: 1.5; max-width: 880px; }
+  .bigword em { color: var(--gold); font-style: italic; }
 
-  table.equiv { width: 100%; max-width: 1040px; border-collapse: collapse; margin: 8px 0; font-size: 14px; }
-  table.equiv th { text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-faint); font-weight: 600; padding: 10px 14px; border-bottom: 1px solid var(--border); }
-  table.equiv td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #cfccdb; vertical-align: top; line-height: 1.55; }
-  table.equiv td:first-child { font-weight: 600; color: var(--ink); }
+  table.equiv { width: 100%; max-width: 1000px; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
+  table.equiv th { text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--ink-faint); font-weight: 600; padding: 0 16px 12px 0; border-bottom: 1px solid var(--border); }
+  table.equiv td { padding: 14px 16px 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #d0ccdc; vertical-align: top; line-height: 1.6; }
+  table.equiv td:first-child { font-weight: 600; color: var(--ink); font-family: 'Fraunces', serif; }
   table.equiv tr:last-child td { border-bottom: none; }
 
   .callout {
-    background: var(--glass); backdrop-filter: blur(6px); border: 1px solid var(--border); border-left: 3px solid var(--gold);
-    border-radius: 12px; padding: 15px 20px; max-width: 900px; margin-top: 18px; font-size: 14.5px; color: #f0e6cf; font-weight: 500; line-height: 1.6;
+    border-left: 2px solid var(--accent-live); padding-left: 20px; margin-top: 22px; max-width: 820px;
+    font-size: 15px; line-height: 1.65; color: #e6dfd0; font-style: italic;
   }
+  .callout strong { font-style: normal; color: var(--ink); font-weight: 600; }
 
-  .thesis { color: var(--ink); font-size: 21px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; line-height: 1.42; max-width: 920px; margin-bottom: 18px; }
+  .thesis { color: var(--ink); font-size: 21px; font-weight: 500; font-family: 'Fraunces', serif; line-height: 1.42; max-width: 900px; margin-bottom: 20px; }
 
-  /* ═══ Layout: split (two column) ═══ */
-  .split-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 56px; align-items: start; margin-top: 4px; }
-  .split-lead .thesis { font-size: 23px; margin-bottom: 0; }
-  .split-rule { width: 44px; height: 3px; background: linear-gradient(90deg, var(--violet), var(--gold)); border-radius: 2px; margin-bottom: 20px; }
+  /* Split layout */
+  .split-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 60px; align-items: start; margin-top: 6px; }
+  .split-lead .thesis { font-size: 24px; margin-bottom: 0; }
 
-  /* ═══ Layout: cards (comparison grid) ═══ */
-  .card-grid { display: grid; gap: 18px; margin-top: 10px; position: relative; }
+  /* Cards layout — flat index-card style, no boxes */
+  .card-grid { display: grid; gap: 40px; margin-top: 16px; position: relative; }
   .card-grid.cols-2 { grid-template-columns: 1fr 1fr; }
   .card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-  .info-card {
-    background: var(--glass); border: 1px solid var(--border); border-top: 3px solid var(--card-accent, var(--violet));
-    border-radius: 14px; padding: 20px 22px;
-  }
-  .info-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
-  .info-card .who { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--ink-faint); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
-  .info-card p { font-size: 13.5px; color: #cfccdb; line-height: 1.6; }
+  .info-card { border-top: 2px solid var(--card-accent, var(--accent-live)); padding-top: 16px; }
+  .info-card h3 { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+  .info-card .who { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-faint); margin-bottom: 13px; text-transform: uppercase; letter-spacing: 0.6px; }
+  .info-card p { font-size: 13.5px; color: #cdc9d9; line-height: 1.65; }
   .info-card ul { list-style: none; }
-  .info-card li { font-size: 13.5px; color: #cfccdb; line-height: 1.6; padding: 4px 0 4px 14px; position: relative; }
-  .info-card li::before { content: ''; position: absolute; left: 0; top: 11px; width: 5px; height: 5px; border-radius: 50%; background: var(--card-accent, var(--violet)); }
+  .info-card li { font-size: 13.5px; color: #cdc9d9; line-height: 1.65; padding: 5px 0 5px 16px; position: relative; }
+  .info-card li::before { content: '\2014'; position: absolute; left: 0; color: var(--ink-faint); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
   .vs-badge {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 40px; height: 40px; border-radius: 50%; background: var(--bg-0); border: 1px solid var(--border);
+    width: 34px; height: 34px; border-radius: 50%; background: var(--bg-0); border: 1px solid var(--border);
     display: flex; align-items: center; justify-content: center;
-    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--gold); letter-spacing: 0.5px;
-    box-shadow: 0 0 0 6px var(--bg-0);
+    font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; color: var(--gold); letter-spacing: 0.5px;
   }
 
-  /* ═══ Layout: stepper (timeline) ═══ */
-  .stepper { display: flex; gap: 22px; margin-top: 10px; }
-  .stage { flex: 1; padding-top: 26px; position: relative; border-top: 2px solid var(--border); }
-  .stage::before {
-    content: ''; position: absolute; top: -6px; left: 0; width: 10px; height: 10px; border-radius: 50%;
-    background: var(--stage-accent, var(--violet)); box-shadow: 0 0 10px var(--stage-accent, var(--violet));
-  }
-  .stage .num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--stage-accent, var(--violet)); font-weight: 700; margin-bottom: 8px; }
-  .stage h4 { font-family: 'Space Grotesk', sans-serif; font-size: 15.5px; font-weight: 700; color: var(--ink); margin-bottom: 8px; line-height: 1.3; }
-  .stage p { font-size: 13px; color: var(--ink-dim); line-height: 1.55; }
+  /* Stepper / timeline */
+  .stepper { display: flex; gap: 26px; margin-top: 14px; }
+  .stage { flex: 1; padding-top: 22px; position: relative; border-top: 1px solid var(--border); }
+  .stage::before { content: ''; position: absolute; top: -4px; left: 0; width: 9px; height: 9px; background: var(--stage-accent, var(--accent-live)); }
+  .stage .num { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--stage-accent, var(--accent-live)); font-weight: 700; margin-bottom: 9px; letter-spacing: 0.5px; }
+  .stage h4 { font-family: 'Fraunces', serif; font-size: 16.5px; font-weight: 600; color: var(--ink); margin-bottom: 8px; line-height: 1.3; }
+  .stage p { font-size: 13px; color: var(--ink-dim); line-height: 1.6; }
 
-  /* ═══ Layout: quote (pull-quote) ═══ */
-  .quote-mark { font-family: Georgia, serif; font-size: 88px; color: var(--violet); opacity: 0.55; line-height: 0.6; margin-bottom: 12px; }
-  .pull-quote { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 600; line-height: 1.4; max-width: 880px; color: var(--ink); margin-bottom: 22px; }
-  .pull-quote .accent { color: var(--gold); }
+  /* Pull quote */
+  .quote-mark { font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; font-size: 80px; color: var(--accent-live); opacity: 0.6; line-height: 0.5; margin-bottom: 18px; }
+  .pull-quote { font-family: 'Fraunces', serif; font-weight: 500; font-size: 33px; line-height: 1.42; max-width: 860px; color: var(--ink); margin-bottom: 26px; }
+  .pull-quote .accent { color: var(--gold); font-style: italic; }
 
-  /* ═══ Layout: colophon ═══ */
-  .colophon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 8px; }
-  .colophon-card { border: 1px solid var(--border); border-radius: 14px; padding: 22px 20px; background: var(--glass); }
-  .colophon-card .role { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin-bottom: 10px; }
-  .colophon-card .name { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
-  .colophon-card p { font-size: 13px; color: var(--ink-dim); line-height: 1.55; }
+  /* Colophon */
+  .colophon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 14px; }
+  .colophon-card { border-top: 2px solid var(--border); padding-top: 16px; }
+  .colophon-card .role { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gold); margin-bottom: 11px; }
+  .colophon-card .name { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; color: var(--ink); margin-bottom: 9px; }
+  .colophon-card p { font-size: 13px; color: var(--ink-dim); line-height: 1.6; }
 
-  /* ═══ DOC MODE ═══ */
+  /* Doc mode */
   .mode-toggle {
     position: fixed; top: 20px; right: 20px; z-index: 200;
     background: rgba(20,21,31,0.72); backdrop-filter: blur(10px); border: 1px solid var(--border); color: var(--ink-dim);
-    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 600; padding: 9px 15px; border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 600; padding: 9px 15px; border-radius: 3px;
     cursor: pointer; transition: all 0.2s; user-select: none; letter-spacing: 0.4px;
   }
-  .mode-toggle:hover { background: rgba(255,255,255,0.08); color: var(--ink); border-color: var(--violet); }
+  .mode-toggle:hover { background: rgba(255,255,255,0.08); color: var(--ink); border-color: var(--accent-live); }
 
   body.print-mode { overflow: auto; height: auto; }
-  body.print-mode .deck { height: auto; }
-  body.print-mode .slide {
-    position: static; opacity: 1; pointer-events: auto; height: auto; min-height: 0;
-    padding: 56px 76px; border-bottom: 1px solid var(--border); transition: none;
-  }
+  body.print-mode .rail { display: none; }
+  body.print-mode .deck { position: static; left: 0; height: auto; }
+  body.print-mode .slide { position: static; opacity: 1; pointer-events: auto; height: auto; min-height: 0; max-width: 900px; margin: 0 auto; padding: 56px 5%; border-bottom: 1px solid var(--border); transition: none; }
   body.print-mode .slide:last-child { border-bottom: none; }
-  body.print-mode .nav { display: none; }
 
   @media (max-width: 860px) {
-    .slide { padding: 44px 26px; }
-    h1 { font-size: 34px; }
+    .rail { flex-direction: row; width: 100%; height: 60px; bottom: auto; padding: 0 18px; justify-content: space-between; border-right: none; border-bottom: 1px solid var(--border); }
+    .rail-track { display: none; }
+    .rail-topic { writing-mode: horizontal-tb; transform: none; margin: 0; }
+    .rail-nav { flex-direction: row; }
+    .deck { left: 0; top: 60px; }
+    .slide { padding: 36px 22px; }
+    h1 { font-size: 32px; }
     h2 { font-size: 22px; }
     .thesis { font-size: 18px; }
-    .split-grid, .card-grid.cols-2, .card-grid.cols-3, .colophon-grid { grid-template-columns: 1fr; }
-    .stepper { flex-direction: column; gap: 18px; }
+    .split-grid, .card-grid.cols-2, .card-grid.cols-3, .colophon-grid { grid-template-columns: 1fr; gap: 26px; }
+    .stepper { flex-direction: column; gap: 20px; }
     .vs-badge { display: none; }
   }
 
   @media print {
     body { overflow: auto !important; height: auto !important; background: #fff !important; color: #111 !important; }
-    .aurora, .nav, .mode-toggle { display: none !important; }
-    .slide::after { display: none !important; }
-    .deck { height: auto !important; }
-    .slide { position: static !important; opacity: 1 !important; pointer-events: auto !important; height: auto !important; min-height: 0 !important; transition: none !important; page-break-inside: avoid; break-inside: avoid; page-break-after: always; break-after: page; }
-    h1 { -webkit-text-fill-color: #111; background: none; color: #111 !important; }
-    .thesis, h2, .pull-quote { color: #111 !important; }
+    .ambient, .rail, .mode-toggle { display: none !important; }
+    .deck { position: static !important; left: 0 !important; height: auto !important; }
+    .slide { position: static !important; opacity: 1 !important; pointer-events: auto !important; height: auto !important; min-height: 0 !important; transition: none !important; max-width: 900px; margin: 0 auto; page-break-inside: avoid; break-inside: avoid; page-break-after: always; break-after: page; }
+    h1, h2, .thesis, .pull-quote { color: #111 !important; -webkit-text-fill-color: #111 !important; }
     .detail-items li, table.equiv td, .info-card p, .info-card li, .stage p { color: #222 !important; }
-    .callout { background: #f4f4f4 !important; color: #222 !important; border-color: #ccc !important; }
+    .callout { color: #333 !important; }
   }
 </style>
 </head>
 <body>
 
-<div class="aurora"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
+<div class="ambient" id="ambientA"></div>
+<div class="ambient" id="ambientB"></div>
+
+<div class="rail">
+  <div class="rail-top">
+    <div class="rail-index" id="railIndex">01</div>
+    <div class="rail-total" id="railTotal">/ 19</div>
+  </div>
+  <div class="rail-track"><div class="rail-fill" id="railFill"></div></div>
+  <div class="rail-topic" id="railTopic">Overview</div>
+  <div class="rail-nav">
+    <button class="rail-btn" id="prevBtn" title="Previous">&#8593;</button>
+    <button class="rail-btn" id="nextBtn" title="Next">&#8595;</button>
+  </div>
+</div>
 
 <div class="deck">
 
   <!-- 0: Hero -->
-  <div class="slide layout-hero active" data-slide="0">
-    <h1>AI Engineer World&rsquo;s Fair 2026:<br>field notes, remixed</h1>
+  <div class="slide layout-hero active" data-slide="0" data-tint="#a78bfa" data-topic="Overview">
+    <h1>AI Engineer World&rsquo;s Fair 2026:<br><em>field notes, remixed</em></h1>
     <div class="subtitle">Nine threads pulled from four days in San Francisco &mdash; loops, harness design, Google&rsquo;s latest, open-weight models, hardware, browser agents, model routing, and a few voice-agent lessons. Curated and rewritten by Siddharth Tayi, with several ideas drawn from Ayush Joshi&rsquo;s and Joe Dean&rsquo;s original knowledge-share deck.</div>
     <div class="tags">
-      <span class="tag" style="--tag:var(--c-harness)">Harness</span>
-      <span class="tag" style="--tag:var(--c-loops)">Loops</span>
-      <span class="tag" style="--tag:var(--c-google)">Google</span>
-      <span class="tag" style="--tag:var(--c-openweights)">Open weights</span>
-      <span class="tag" style="--tag:var(--c-hardware)">Hardware</span>
-      <span class="tag" style="--tag:var(--c-localllms)">Local LLMs</span>
-      <span class="tag" style="--tag:var(--c-routing)">Model routing</span>
-      <span class="tag" style="--tag:var(--c-voice)">Voice</span>
-      <span class="tag" style="--tag:var(--c-browser)">Browser agents</span>
+      <span class="tag" style="--tag:#a78bfa">Harness</span>
+      <span class="tag" style="--tag:#2dd4bf">Loops</span>
+      <span class="tag" style="--tag:#60a5fa">Google</span>
+      <span class="tag" style="--tag:#34d399">Open weights</span>
+      <span class="tag" style="--tag:#fb7185">Hardware</span>
+      <span class="tag" style="--tag:#fbbf24">Local LLMs</span>
+      <span class="tag" style="--tag:#22d3ee">Model routing</span>
+      <span class="tag" style="--tag:#f472b6">Voice</span>
+      <span class="tag" style="--tag:#fb923c">Browser agents</span>
     </div>
     <div class="meta">RealPage &middot; IT &mdash; BEST &middot; San Francisco, Jun 29&ndash;Jul 2, 2026</div>
   </div>
 
   <!-- 1: Harness thesis (statement) -->
-  <div class="slide layout-statement" data-slide="1">
-    <div class="tags"><span class="tag" style="--tag:var(--c-harness)">Harness</span></div>
+  <div class="slide layout-statement" data-slide="1" data-tint="#a78bfa" data-topic="Harness">
+    <div class="tags"><span class="tag" style="--tag:#a78bfa">Harness</span></div>
     <h2>The question changed: not which model, but which harness</h2>
     <div class="bigword">Last year the industry argued about <em>which model</em>. This year nobody argued about models &mdash; the whole conference argued about <em>the harness</em>: how you plan, loop, verify, and govern the agents that models power.</div>
-    <div class="bigword" style="margin-top:24px;">And the sharpest debate underneath it &mdash; lights-off software factories vs. humans conducting orchestras &mdash; landed on the orchestra: a human orchestrating and reviewing the agents, never stepping out of the loop.</div>
+    <div class="bigword" style="margin-top:26px;">And the sharpest debate underneath it &mdash; lights-off software factories vs. humans conducting orchestras &mdash; landed on the orchestra: a human orchestrating and reviewing the agents, never stepping out of the loop.</div>
   </div>
 
   <!-- 2: Loops (list) -->
-  <div class="slide layout-list" data-slide="2">
-    <div class="tags"><span class="tag" style="--tag:var(--c-loops)">Loops</span></div>
+  <div class="slide layout-list" data-slide="2" data-tint="#2dd4bf" data-topic="Loops">
+    <div class="tags"><span class="tag" style="--tag:#2dd4bf">Loops</span></div>
     <h2>Loops that survive real codebases</h2>
     <ul class="detail-items">
       <li><strong>Kyle Mistele (HumanLayer):</strong> blind &ldquo;run it in a bash loop&rdquo; agents don&rsquo;t fit teams with customers and SLAs. Build agentic control loops from control theory instead: set point &rarr; sensor (linters, ast-grep) &rarr; controller picks <em>one small change</em> &rarr; actuator (agent + skill).</li>
@@ -291,11 +266,11 @@
   </div>
 
   <!-- 3: Harness / Ayush (stepper) -->
-  <div class="slide layout-stepper" data-slide="3">
-    <div class="tags"><span class="tag" style="--tag:var(--c-harness)">Harness</span></div>
+  <div class="slide layout-stepper" data-slide="3" data-tint="#a78bfa" data-topic="Harness">
+    <div class="tags"><span class="tag" style="--tag:#a78bfa">Harness</span></div>
     <h2 class="tight">The durable product is the harness around the model</h2>
     <div class="thesis" style="font-size:16px; color:var(--ink-dim); font-family:'Inter',sans-serif; font-weight:500;">Traces, evals, diagnosis, bounded auto-fix, and a closed improvement loop convert real failures into reusable system knowledge.</div>
-    <div class="stepper" style="--stage-accent:var(--c-harness);">
+    <div class="stepper" style="--stage-accent:#a78bfa;">
       <div class="stage"><div class="num">01</div><h4>Observe</h4><p>Traces preserve the context, path, tool calls, cost, latency, and outcome.</p></div>
       <div class="stage"><div class="num">02</div><h4>Diagnose</h4><p>Failures are classified as model, context, tool, policy, orchestration, or UX defects.</p></div>
       <div class="stage"><div class="num">03</div><h4>Codify</h4><p>The fix becomes an eval, deterministic check, skill, policy, or runtime change.</p></div>
@@ -305,19 +280,19 @@
   </div>
 
   <!-- 4: Google / Open weights (cards) -->
-  <div class="slide layout-cards" data-slide="4">
+  <div class="slide layout-cards" data-slide="4" data-tint="#60a5fa" data-topic="Google / Open Weights">
     <div class="tags">
-      <span class="tag" style="--tag:var(--c-google)">Google</span>
-      <span class="tag" style="--tag:var(--c-openweights)">Open weights</span>
+      <span class="tag" style="--tag:#60a5fa">Google</span>
+      <span class="tag" style="--tag:#34d399">Open weights</span>
     </div>
     <h2>Inside Google, and the open-weights front</h2>
     <div class="card-grid cols-2">
-      <div class="info-card" style="--card-accent:var(--c-google);">
+      <div class="info-card" style="--card-accent:#60a5fa;">
         <h3>Interactions API</h3>
         <div class="who">Google DeepMind</div>
         <p>One unified call for models <em>and</em> agents &mdash; server-side state, sandboxes, background execution. Explicitly moving past turn-based chat.</p>
       </div>
-      <div class="info-card" style="--card-accent:var(--c-openweights);">
+      <div class="info-card" style="--card-accent:#34d399;">
         <h3>GLM-5.2 keynote</h3>
         <div class="who">Z.ai</div>
         <p>Open-weight frontier models &ldquo;built for long-horizon tasks&rdquo; &mdash; keeping the routing/cost conversation alive, and setting up the local/open-weight thread the rest of this deck follows.</p>
@@ -326,8 +301,8 @@
   </div>
 
   <!-- 5: Model routing / Ayush (list) -->
-  <div class="slide layout-list" data-slide="5">
-    <div class="tags"><span class="tag" style="--tag:var(--c-routing)">Model routing</span></div>
+  <div class="slide layout-list" data-slide="5" data-tint="#22d3ee" data-topic="Model Routing">
+    <div class="tags"><span class="tag" style="--tag:#22d3ee">Model routing</span></div>
     <h2>The right model is the smallest one that meets the quality bar</h2>
     <div class="thesis">Model choice and serving architecture work together. A smaller, task-fit model on an inference-optimized platform can improve latency, cost, and throughput without sacrificing the outcome.</div>
     <ul class="detail-items">
@@ -339,11 +314,10 @@
   </div>
 
   <!-- 6: Voice 1 / Ayush (split) -->
-  <div class="slide layout-split" data-slide="6">
-    <div class="tags"><span class="tag" style="--tag:var(--c-voice)">Voice</span></div>
+  <div class="slide layout-split" data-slide="6" data-tint="#f472b6" data-topic="Voice">
+    <div class="tags"><span class="tag" style="--tag:#f472b6">Voice</span></div>
     <div class="split-grid">
       <div class="split-lead">
-        <div class="split-rule"></div>
         <h2>Voice is the stress test for the entire agent architecture</h2>
         <div class="thesis">Voice is not an audio wrapper around chat. It is a realtime agent runtime that exposes every weakness in state, latency, tools, and recovery.</div>
       </div>
@@ -360,22 +334,22 @@
   </div>
 
   <!-- 7: Voice 2 / Ayush (cards, 3-way) -->
-  <div class="slide layout-cards" data-slide="7">
-    <div class="tags"><span class="tag" style="--tag:var(--c-voice)">Voice</span></div>
+  <div class="slide layout-cards" data-slide="7" data-tint="#f472b6" data-topic="Voice">
+    <div class="tags"><span class="tag" style="--tag:#f472b6">Voice</span></div>
     <h2 class="tight">There is no single voice stack</h2>
     <div class="thesis" style="font-size:16px; color:var(--ink-dim); font-family:'Inter',sans-serif; font-weight:500;">The architecture determines what we can optimize, inspect, and control &mdash; the right choice depends on the workflow&rsquo;s risk, not which demo sounds most human.</div>
     <div class="card-grid cols-3">
-      <div class="info-card" style="--card-accent:var(--c-voice);">
+      <div class="info-card" style="--card-accent:#f472b6;">
         <h3>Cascaded</h3>
         <div class="who">speech &rarr; text &rarr; reasoning &rarr; speech</div>
         <p>Modular, inspectable, and easier to connect to tools, policy, and existing text agents. Every stage adds latency; transcription can discard tone and ambiguity.</p>
       </div>
-      <div class="info-card" style="--card-accent:var(--c-voice);">
+      <div class="info-card" style="--card-accent:#f472b6;">
         <h3>Speech-to-speech</h3>
         <div class="who">direct audio-to-audio</div>
         <p>Lower-latency, expressive interaction with natural timing and prosody. Harder to inspect, govern, ground in tools, and explain when behavior fails.</p>
       </div>
-      <div class="info-card" style="--card-accent:var(--c-voice);">
+      <div class="info-card" style="--card-accent:#f472b6;">
         <h3>Hybrid stack</h3>
         <div class="who">production default</div>
         <p>Speech-native interaction with explicit state, tools, policy checks, and verification. More orchestration, but control and naturalness tune independently.</p>
@@ -385,8 +359,8 @@
   </div>
 
   <!-- 8: Voice 3 / Ayush (list) -->
-  <div class="slide layout-list" data-slide="8">
-    <div class="tags"><span class="tag" style="--tag:var(--c-voice)">Voice</span></div>
+  <div class="slide layout-list" data-slide="8" data-tint="#f472b6" data-topic="Voice">
+    <div class="tags"><span class="tag" style="--tag:#f472b6">Voice</span></div>
     <h2>Humanlike behavior is a system metric, not a model benchmark</h2>
     <div class="thesis">Users experience one delay, but the budget is spent across end-of-turn detection, recognition, reasoning, tools, speech generation, and the network.</div>
     <ul class="detail-items">
@@ -399,8 +373,8 @@
   </div>
 
   <!-- 9: Google overview / Siddharth (list) -->
-  <div class="slide layout-list" data-slide="9">
-    <div class="tags"><span class="tag" style="--tag:var(--c-google)">Google</span></div>
+  <div class="slide layout-list" data-slide="9" data-tint="#60a5fa" data-topic="Google">
+    <div class="tags"><span class="tag" style="--tag:#60a5fa">Google</span></div>
     <h2>Gemini 3.1 raises the bar on OCR, audio, video, and latency</h2>
     <div class="thesis">Gemini 3.1 reads less like an incremental update and more like a step-change across every multimodal fundamental &mdash; and it sits inside a DeepMind research mission that reaches well past chatbots.</div>
     <ul class="detail-items">
@@ -412,12 +386,12 @@
   </div>
 
   <!-- 10: Gemini vs Gemma / Siddharth (cards, head-to-head) -->
-  <div class="slide layout-cards" data-slide="10">
-    <div class="tags"><span class="tag" style="--tag:var(--c-google)">Google</span></div>
+  <div class="slide layout-cards" data-slide="10" data-tint="#60a5fa" data-topic="Google">
+    <div class="tags"><span class="tag" style="--tag:#60a5fa">Google</span></div>
     <h2 class="tight">Gemini 3.1 Flash and Gemma are close &mdash; except on video</h2>
     <div class="thesis" style="font-size:16px; color:var(--ink-dim); font-family:'Inter',sans-serif; font-weight:500;">Gemma shadows Gemini 3.1 Flash closely on quality; the real divergence shows up in just two tasks.</div>
     <div class="card-grid cols-2">
-      <div class="info-card" style="--card-accent:var(--c-google);">
+      <div class="info-card" style="--card-accent:#60a5fa;">
         <h3>Gemini 3.1 Flash</h3>
         <div class="who">cloud flagship</div>
         <ul>
@@ -426,7 +400,7 @@
         </ul>
       </div>
       <div class="vs-badge">VS</div>
-      <div class="info-card" style="--card-accent:var(--c-gold, var(--gold));">
+      <div class="info-card" style="--card-accent:#eec080;">
         <h3>Gemma</h3>
         <div class="who">on par almost everywhere</div>
         <ul>
@@ -439,14 +413,13 @@
   </div>
 
   <!-- 11: Gemma 4 / Siddharth (split) -->
-  <div class="slide layout-split" data-slide="11">
+  <div class="slide layout-split" data-slide="11" data-tint="#fb7185" data-topic="Google / Hardware">
     <div class="tags">
-      <span class="tag" style="--tag:var(--c-google)">Google</span>
-      <span class="tag" style="--tag:var(--c-hardware)">Hardware</span>
+      <span class="tag" style="--tag:#60a5fa">Google</span>
+      <span class="tag" style="--tag:#fb7185">Hardware</span>
     </div>
     <div class="split-grid">
       <div class="split-lead">
-        <div class="split-rule"></div>
         <h2>Gemma 4 puts frontier techniques on your phone</h2>
         <div class="thesis">Google is now shipping models that run on a slice of the phone&rsquo;s own processor and do the job of far larger, machine-hosted models &mdash; while staying on par with Gemini 3.1 on streaming, audio transcription, and overall intelligence.</div>
         <div class="callout">The booth&rsquo;s best moment: this model running live, on a phone, in the demo &mdash; AI genuinely at your fingertips.</div>
@@ -463,14 +436,14 @@
   </div>
 
   <!-- 12: GLM DGX demo / Siddharth (stepper / timeline) -->
-  <div class="slide layout-stepper" data-slide="12">
+  <div class="slide layout-stepper" data-slide="12" data-tint="#fb7185" data-topic="Hardware / Open Weights">
     <div class="tags">
-      <span class="tag" style="--tag:var(--c-hardware)">Hardware</span>
-      <span class="tag" style="--tag:var(--c-openweights)">Open weights</span>
+      <span class="tag" style="--tag:#fb7185">Hardware</span>
+      <span class="tag" style="--tag:#34d399">Open weights</span>
     </div>
     <h2 class="tight">GLM 5.2 on DGX Station: frontier intelligence under your desk</h2>
     <div class="thesis" style="font-size:16px; color:var(--ink-dim); font-family:'Inter',sans-serif; font-weight:500;">Frontier-scale intelligence is migrating from the datacenter to the desk, as GPUs and models both get more efficient. &mdash; Ahmad M. Osman, Founder/CEO, Osmanatic</div>
-    <div class="stepper" style="--stage-accent:var(--c-hardware);">
+    <div class="stepper" style="--stage-accent:#fb7185;">
       <div class="stage"><div class="num">LIVE</div><h4>DGX Station</h4><p>GLM models demoed running on an NVIDIA DGX Station.</p></div>
       <div class="stage"><div class="num">MID-2027 (?)</div><h4>RTX 5090</h4><p>GLM-class models on a single 64GB card &mdash; sequencing wasn&rsquo;t fully clear from the session.</p></div>
       <div class="stage"><div class="num">LATE 2027 (?)</div><h4>Further jump</h4><p>More capability expected on the same class of hardware.</p></div>
@@ -480,10 +453,10 @@
   </div>
 
   <!-- 13: Local LLMs / Siddharth (list) -->
-  <div class="slide layout-list" data-slide="13">
+  <div class="slide layout-list" data-slide="13" data-tint="#fbbf24" data-topic="Local LLMs">
     <div class="tags">
-      <span class="tag" style="--tag:var(--c-localllms)">Local LLMs</span>
-      <span class="tag" style="--tag:var(--c-hardware)">Hardware</span>
+      <span class="tag" style="--tag:#fbbf24">Local LLMs</span>
+      <span class="tag" style="--tag:#fb7185">Hardware</span>
     </div>
     <h2>Local LLMs: hardware is the new oil</h2>
     <div class="thesis">NVIDIA and a panel of CEOs made the case that local LLMs are a bigger platform shift than most roadmaps assume &mdash; and that hardware, not the model, is the bottleneck to watch.</div>
@@ -496,11 +469,10 @@
   </div>
 
   <!-- 14: Model routing / Siddharth (split) -->
-  <div class="slide layout-split" data-slide="14">
-    <div class="tags"><span class="tag" style="--tag:var(--c-routing)">Model routing</span></div>
+  <div class="slide layout-split" data-slide="14" data-tint="#22d3ee" data-topic="Model Routing">
+    <div class="tags"><span class="tag" style="--tag:#22d3ee">Model routing</span></div>
     <div class="split-grid">
       <div class="split-lead">
-        <div class="split-rule"></div>
         <h2>Give each agent the model built for its job</h2>
         <div class="thesis">Stop sending every task to one model. Route by task, and let each sub-agent run the model that&rsquo;s actually strong in that domain.</div>
         <div class="callout">Every agent spun up this way carries its own model, context, memory, and tools: a mini harness in its own right.</div>
@@ -516,8 +488,8 @@
   </div>
 
   <!-- 15: Context/cost/cache / Siddharth (list) -->
-  <div class="slide layout-list" data-slide="15">
-    <div class="tags"><span class="tag" style="--tag:var(--c-routing)">Model routing</span></div>
+  <div class="slide layout-list" data-slide="15" data-tint="#22d3ee" data-topic="Model Routing">
+    <div class="tags"><span class="tag" style="--tag:#22d3ee">Model routing</span></div>
     <h2>Context lives with one model &mdash; cost still has to be earned</h2>
     <div class="thesis">Split work across a main model and smaller task models, and one question dominates: where does the context actually live?</div>
     <ul class="detail-items">
@@ -529,11 +501,11 @@
   </div>
 
   <!-- 16: Harness evolution / Siddharth (stepper) -->
-  <div class="slide layout-stepper" data-slide="16">
-    <div class="tags"><span class="tag" style="--tag:var(--c-harness)">Harness</span></div>
+  <div class="slide layout-stepper" data-slide="16" data-tint="#a78bfa" data-topic="Harness">
+    <div class="tags"><span class="tag" style="--tag:#a78bfa">Harness</span></div>
     <h2 class="tight">From instructions, to agents, to agents on the fly</h2>
     <div class="thesis" style="font-size:16px; color:var(--ink-dim); font-family:'Inter',sans-serif; font-weight:500;">The harness pattern has moved through four stages, each one stripping out a layer of manual setup.</div>
-    <div class="stepper" style="--stage-accent:var(--c-harness);">
+    <div class="stepper" style="--stage-accent:#a78bfa;">
       <div class="stage"><div class="num">01</div><h4>Direct instruction</h4><p>Tell Claude or Codex what to do, and it does it &mdash; no persistent agent structure.</p></div>
       <div class="stage"><div class="num">02</div><h4>Agents</h4><p>Create an agent and assign it a task, a goal, and a role.</p></div>
       <div class="stage"><div class="num">03</div><h4>Sub-agents</h4><p>Sub-agents get created as needed, per request, under a parent agent.</p></div>
@@ -543,8 +515,8 @@
   </div>
 
   <!-- 17: Browserbase / Siddharth (quote) -->
-  <div class="slide layout-quote" data-slide="17">
-    <div class="tags"><span class="tag" style="--tag:var(--c-browser)">Browser agents</span></div>
+  <div class="slide layout-quote" data-slide="17" data-tint="#fb923c" data-topic="Browser Agents">
+    <div class="tags"><span class="tag" style="--tag:#fb923c">Browser agents</span></div>
     <div class="quote-mark">&ldquo;</div>
     <div class="pull-quote">Browserbase builds browser-based agents &mdash; and it&rsquo;s already the tool <span class="accent">my own team runs</span> on a live RealPage project. Met their sales engineer at the booth: small world.</div>
     <ul class="detail-items tight">
@@ -555,8 +527,8 @@
   </div>
 
   <!-- 18: Colophon -->
-  <div class="slide layout-colophon" data-slide="18">
-    <div class="tags"><span class="tag" style="--tag:var(--c-harness)">Colophon</span></div>
+  <div class="slide layout-colophon" data-slide="18" data-tint="#eec080" data-topic="Colophon">
+    <div class="tags"><span class="tag" style="--tag:#eec080">Colophon</span></div>
     <h2>Notes, remixed</h2>
     <div class="subtitle" style="max-width:820px;">This page is a curated, redesigned remix of a longer knowledge-share deck &mdash; nine threads pulled out of 26 sessions across four days at AI Engineer World&rsquo;s Fair 2026.</div>
     <div class="colophon-grid">
@@ -583,38 +555,61 @@
 
 <button class="mode-toggle" id="modeToggle">Doc mode</button>
 
-<div class="nav">
-  <button class="nav-btn" id="prevBtn">&#8592;</button>
-  <div class="nav-dots" id="navDots"></div>
-  <div class="nav-counter" id="navCounter"></div>
-  <button class="nav-btn" id="nextBtn">&#8594;</button>
-</div>
-
 <script>
 (function(){
   var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
-  var dotsWrap = document.getElementById('navDots');
-  var counter = document.getElementById('navCounter');
+  var railIndex = document.getElementById('railIndex');
+  var railTotal = document.getElementById('railTotal');
+  var railFill = document.getElementById('railFill');
+  var railTopic = document.getElementById('railTopic');
   var prevBtn = document.getElementById('prevBtn');
   var nextBtn = document.getElementById('nextBtn');
   var modeToggle = document.getElementById('modeToggle');
+  var ambientA = document.getElementById('ambientA');
+  var ambientB = document.getElementById('ambientB');
+  var ambientEls = [ambientA, ambientB];
+  var activeAmbient = 0;
   var current = 0;
 
-  slides.forEach(function(_, i){
-    var d = document.createElement('div');
-    d.className = 'nav-dot' + (i === 0 ? ' active' : '');
-    d.addEventListener('click', function(){ go(i); });
-    dotsWrap.appendChild(d);
-  });
-  var dots = Array.prototype.slice.call(dotsWrap.children);
+  railTotal.textContent = '/ ' + slides.length;
+
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+
+  function gradientFor(tint){
+    return 'radial-gradient(ellipse 900px 700px at 18% 15%, ' + tint + '30 0%, transparent 60%),' +
+           'radial-gradient(ellipse 700px 620px at 88% 88%, ' + tint + '1c 0%, transparent 58%)';
+  }
+
+  function applyAmbient(tint){
+    var next = 1 - activeAmbient;
+    var incoming = ambientEls[next];
+    var outgoing = ambientEls[activeAmbient];
+    incoming.style.background = gradientFor(tint);
+    incoming.style.opacity = '1';
+    outgoing.style.opacity = '0';
+    activeAmbient = next;
+  }
+
+  function render(){
+    var s = slides[current];
+    var tint = s.getAttribute('data-tint') || '#a78bfa';
+    var topic = s.getAttribute('data-topic') || '';
+    railIndex.textContent = pad(current + 1);
+    railFill.style.height = (((current + 1) / slides.length) * 100) + '%';
+    railTopic.textContent = topic;
+    railTopic.style.color = tint;
+    railFill.style.background = tint;
+    document.documentElement.style.setProperty('--accent-live', tint);
+    applyAmbient(tint);
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+  }
 
   function go(i){
     if (i < 0 || i >= slides.length) return;
     slides[current].classList.remove('active');
-    dots[current].classList.remove('active');
     current = i;
     slides[current].classList.add('active');
-    dots[current].classList.add('active');
     if (history.replaceState) history.replaceState(null, '', '#slide-' + (i + 1));
     render();
   }
@@ -623,16 +618,12 @@
     if (m) { var i = parseInt(m[1], 10) - 1; if (i >= 0 && i < slides.length && i !== current) go(i); }
   }
   window.addEventListener('hashchange', fromHash);
-  function render(){
-    counter.textContent = (current + 1) + ' / ' + slides.length;
-    prevBtn.disabled = current === 0;
-    nextBtn.disabled = current === slides.length - 1;
-  }
+
   prevBtn.addEventListener('click', function(){ go(current - 1); });
   nextBtn.addEventListener('click', function(){ go(current + 1); });
   document.addEventListener('keydown', function(e){
-    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(current + 1); }
-    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(current - 1); }
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(current + 1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); go(current - 1); }
     if (e.key === 'Home') { e.preventDefault(); go(0); }
     if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
   });
@@ -640,6 +631,7 @@
     document.body.classList.toggle('print-mode');
     modeToggle.textContent = document.body.classList.contains('print-mode') ? 'Deck mode' : 'Doc mode';
   });
+
   fromHash();
   render();
 })();
