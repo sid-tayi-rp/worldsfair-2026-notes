@@ -38,6 +38,15 @@
     pointer-events: none;
   }
 
+  /* Cursor-reactive spotlight */
+  .spotlight {
+    position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0;
+    background: radial-gradient(560px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.045), transparent 62%);
+    transition: opacity 0.4s ease;
+  }
+  body.has-mouse .spotlight { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .spotlight { display: none; } }
+
   .rail {
     position: fixed; top: 0; left: 0; bottom: 0; width: 104px; z-index: 150;
     display: flex; flex-direction: column; align-items: center; justify-content: space-between;
@@ -49,20 +58,33 @@
   .rail-top { display: flex; flex-direction: column; align-items: center; gap: 1px; }
   .rail-index { font-family: 'JetBrains Mono', monospace; font-size: 23px; font-weight: 700; color: var(--ink); letter-spacing: -0.5px; }
   .rail-total { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--ink-faint); }
-  .rail-track { position: relative; width: 2px; flex: 1; background: rgba(255,255,255,0.08); margin: 22px 0; border-radius: 2px; overflow: hidden; }
-  .rail-fill { position: absolute; top: 0; left: 0; width: 100%; height: 0%; border-radius: 2px; background: var(--accent-live); transition: height 0.5s ease, background 0.6s ease; }
+  .rail-track { position: relative; width: 2px; flex: 1; background: rgba(255,255,255,0.08); margin: 26px 0; border-radius: 2px; overflow: visible; }
+  .rail-fill { position: absolute; top: 0; left: 0; width: 100%; height: 0%; border-radius: 2px; background: var(--accent-live); transition: height 0.6s cubic-bezier(.22,1,.36,1), background 0.6s ease; overflow: visible; }
+  .rail-fill::after {
+    content: ''; position: absolute; left: 50%; bottom: 0; transform: translate(-50%, 50%);
+    width: 11px; height: 11px; border-radius: 50%; background: var(--accent-live);
+    box-shadow: 0 0 14px 3px color-mix(in srgb, var(--accent-live) 70%, transparent);
+    transition: background 0.6s ease, box-shadow 0.6s ease;
+  }
   .rail-topic {
     writing-mode: vertical-rl; transform: rotate(180deg);
     font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase;
     color: var(--accent-live); margin: 16px 0; white-space: nowrap; transition: color 0.6s ease;
   }
+  .rail-topic.fade { animation: railFade 0.55s cubic-bezier(.22,1,.36,1); }
+  .rail-index.fade, .rail-total.fade { animation: railFade 0.45s ease; }
+  @keyframes railFade { from { opacity: 0; } to { opacity: 1; } }
   .rail-nav { display: flex; flex-direction: column; gap: 10px; align-items: center; }
   .rail-btn {
     width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.14);
     background: rgba(255,255,255,0.02); color: var(--ink-dim);
-    display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.22s ease; font-size: 14px;
   }
-  .rail-btn:hover { border-color: var(--ink); color: var(--ink); background: rgba(255,255,255,0.07); }
+  .rail-btn:hover:not(:disabled) {
+    border-color: var(--accent-live); color: var(--ink); background: rgba(255,255,255,0.07);
+    transform: scale(1.1); box-shadow: 0 0 16px color-mix(in srgb, var(--accent-live) 45%, transparent);
+  }
+  .rail-btn:active:not(:disabled) { transform: scale(0.92); }
   .rail-btn:disabled { opacity: 0.22; cursor: default; }
 
   .deck { position: absolute; top: 0; left: 104px; right: 0; bottom: 0; z-index: 1; }
@@ -71,11 +93,34 @@
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     padding: 60px 8% 60px 6%;
     display: flex; flex-direction: column; justify-content: center;
-    opacity: 0; pointer-events: none; transition: opacity 0.55s ease;
+    opacity: 0; pointer-events: none;
+    transform: translateY(34px) scale(0.984);
+    filter: blur(3px);
+    transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1), filter 0.7s ease;
     max-width: 1100px;
+    will-change: transform, opacity, filter;
   }
-  .slide.active { opacity: 1; pointer-events: auto; }
+  .slide.active { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); filter: blur(0); }
   .slide.layout-hero, .slide.layout-statement, .slide.layout-quote { justify-content: center; }
+
+  @keyframes riseIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  .slide.active > * { animation: riseIn 0.7s cubic-bezier(.22,1,.36,1) both; }
+  .slide.active > *:nth-child(1) { animation-delay: .04s; }
+  .slide.active > *:nth-child(2) { animation-delay: .12s; }
+  .slide.active > *:nth-child(3) { animation-delay: .20s; }
+  .slide.active > *:nth-child(4) { animation-delay: .28s; }
+  .slide.active > *:nth-child(5) { animation-delay: .36s; }
+  .slide.active .card-grid > *,
+  .slide.active .stepper > * { animation: riseIn 0.6s cubic-bezier(.22,1,.36,1) both; }
+  .slide.active .card-grid > *:nth-child(1), .slide.active .stepper > *:nth-child(1) { animation-delay: .34s; }
+  .slide.active .card-grid > *:nth-child(2), .slide.active .stepper > *:nth-child(2) { animation-delay: .42s; }
+  .slide.active .card-grid > *:nth-child(3), .slide.active .stepper > *:nth-child(3) { animation-delay: .50s; }
+  .slide.active .card-grid > *:nth-child(4), .slide.active .stepper > *:nth-child(4) { animation-delay: .58s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide { transition: opacity 0.3s ease !important; transform: none !important; filter: none !important; }
+    .slide.active > *, .slide.active .card-grid > *, .slide.active .stepper > * { animation: none !important; }
+  }
 
   /* Kicker tags — flat, editorial, no pill/box */
   .tags { display: flex; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; align-items: center; }
@@ -210,6 +255,7 @@
 
 <div class="ambient" id="ambientA"></div>
 <div class="ambient" id="ambientB"></div>
+<div class="spotlight" id="spotlight"></div>
 
 <div class="rail">
   <div class="rail-top">
@@ -570,8 +616,24 @@
   var ambientEls = [ambientA, ambientB];
   var activeAmbient = 0;
   var current = 0;
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   railTotal.textContent = '/ ' + slides.length;
+
+  if (!reduceMotion) {
+    var spotlight = document.getElementById('spotlight');
+    document.addEventListener('mousemove', function(e){
+      document.documentElement.style.setProperty('--mx', e.clientX + 'px');
+      document.documentElement.style.setProperty('--my', e.clientY + 'px');
+      document.body.classList.add('has-mouse');
+    }, { passive: true });
+  }
+
+  function pulse(el, cls){
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+  }
 
   function pad(n){ return n < 10 ? '0' + n : '' + n; }
 
@@ -603,13 +665,49 @@
     applyAmbient(tint);
     prevBtn.disabled = current === 0;
     nextBtn.disabled = current === slides.length - 1;
+    if (!reduceMotion) {
+      pulse(railTopic, 'fade');
+      pulse(railIndex, 'fade');
+    }
   }
 
   function go(i){
-    if (i < 0 || i >= slides.length) return;
-    slides[current].classList.remove('active');
+    if (i < 0 || i >= slides.length || i === current) return;
+    var forward = i > current;
+    var outgoing = slides[current];
+    var incoming = slides[i];
+
+    if (!reduceMotion) {
+      var startY = forward ? 34 : -34;
+      incoming.style.transition = 'none';
+      incoming.style.transform = 'translateY(' + startY + 'px) scale(0.984)';
+      incoming.style.opacity = '0';
+      incoming.style.filter = 'blur(3px)';
+      void incoming.offsetWidth;
+      incoming.style.transition = '';
+
+      var endY = forward ? -34 : 34;
+      outgoing.style.transform = 'translateY(' + endY + 'px) scale(0.984)';
+      outgoing.style.opacity = '0';
+      outgoing.style.filter = 'blur(3px)';
+      outgoing.classList.remove('active');
+
+      incoming.style.transform = '';
+      incoming.style.opacity = '';
+      incoming.style.filter = '';
+      incoming.classList.add('active');
+
+      window.setTimeout(function(){
+        outgoing.style.transform = '';
+        outgoing.style.opacity = '';
+        outgoing.style.filter = '';
+      }, 720);
+    } else {
+      outgoing.classList.remove('active');
+      incoming.classList.add('active');
+    }
+
     current = i;
-    slides[current].classList.add('active');
     if (history.replaceState) history.replaceState(null, '', '#slide-' + (i + 1));
     render();
   }
