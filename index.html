@@ -233,19 +233,6 @@
     margin-bottom: 18px;
   }
 
-  .credit {
-    position: absolute;
-    right: 76px;
-    bottom: 26px;
-    color: var(--ink-faint);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9.5px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-  }
-  .credit::before { content: '\2014 '; }
-
   /* ═══ DOC MODE ═══ */
   .mode-toggle {
     position: fixed;
@@ -282,14 +269,12 @@
   }
   body.print-mode .slide:last-child { border-bottom: none; }
   body.print-mode .nav { display: none; }
-  body.print-mode .credit { position: static; display: block; margin-top: 18px; }
 
   @media (max-width: 860px) {
     .slide { padding: 44px 26px; }
     h1 { font-size: 34px; }
     h2 { font-size: 22px; }
     .thesis { font-size: 18px; }
-    .credit { right: 26px; }
   }
 
   @media print {
@@ -312,7 +297,6 @@
     .thesis, h2 { color: #111 !important; }
     .detail-items li, table.equiv td { color: #222 !important; }
     .callout { background: #f4f4f4 !important; color: #222 !important; border-color: #ccc !important; }
-    .credit { position: static !important; color: #666 !important; }
   }
 </style>
 </head>
@@ -346,7 +330,6 @@
     <h2>The question changed: not which model, but which harness</h2>
     <div class="bigword">Last year the industry argued about <em>which model</em>. This year nobody argued about models &mdash; the whole conference argued about <em>the harness</em>: how you plan, loop, verify, and govern the agents that models power.</div>
     <div class="bigword" style="margin-top:24px;">And the sharpest debate underneath it &mdash; lights-off software factories vs. humans conducting orchestras &mdash; landed on the orchestra: a human orchestrating and reviewing the agents, never stepping out of the loop.</div>
-    <div class="credit">Joe Dean</div>
   </div>
 
   <!-- 2: Loops -->
@@ -360,7 +343,6 @@
       <li><strong>Theo Browne:</strong> today&rsquo;s frontier models already orchestrate &mdash; spawning sub-agents, splitting and verifying work &mdash; on prompt alone. &ldquo;We need to go bigger.&rdquo;</li>
     </ul>
     <div class="callout">The strongest production loops already look like control systems, not chat sessions &mdash; a one-open-PR gate and a version-controlled feedback file are the upgrade worth stealing.</div>
-    <div class="credit">Joe Dean</div>
   </div>
 
   <!-- 3: Harness / Ayush -->
@@ -375,7 +357,6 @@
       <li><strong>Verify:</strong> the new contract is tested before the loop is allowed to expand autonomy.</li>
     </ul>
     <div class="callout"><strong>Value:</strong> usage makes the platform more reliable instead of generating the same incident at higher volume. <strong>Failure mode:</strong> without this loop, more autonomy only accelerates repeat mistakes.</div>
-    <div class="credit">Ayush Joshi</div>
   </div>
 
   <!-- 4: Google / Open weights -->
@@ -389,7 +370,6 @@
       <li><strong>Google DeepMind:</strong> the new <strong>Interactions API</strong> &mdash; one unified call for models <em>and</em> agents, server-side state, sandboxes, background execution; explicitly moving past turn-based chat.</li>
       <li><strong>Z.ai&rsquo;s GLM-5.2 keynote:</strong> open-weight frontier models &ldquo;built for long-horizon tasks&rdquo; keep the routing/cost conversation alive &mdash; and set up the local/open-weight thread the rest of this deck follows.</li>
     </ul>
-    <div class="credit">Joe Dean</div>
   </div>
 
   <!-- 5: Model routing / Ayush -->
@@ -403,7 +383,6 @@
       <li><strong>Measure the real workload:</strong> compare task success, p50/p95 latency, and cost per successful task under realistic concurrency &mdash; not a single-request benchmark.</li>
     </ul>
     <div class="callout"><strong>Decision:</strong> use the smallest model that clears the evals on an optimized serving platform. Add model capability or infrastructure control only when quality, privacy, or the SLO requires it.</div>
-    <div class="credit">Ayush Joshi</div>
   </div>
 
   <!-- 6: Voice 1 / Ayush -->
@@ -418,7 +397,6 @@
       <li><strong>Correctness is observable behavior:</strong> did the tool complete, did the user hear the right status, and did the system escalate cleanly?</li>
     </ul>
     <div class="callout"><strong>Required evals:</strong> interruption recovery, end-of-turn to first audio, tool completion, state consistency, and escalation &mdash; at p50 and tail latency.</div>
-    <div class="credit">Ayush Joshi</div>
   </div>
 
   <!-- 7: Voice 2 / Ayush -->
@@ -433,7 +411,6 @@
       <tr><td>Hybrid production stack</td><td>Speech-native interaction with explicit state, tools, policy checks, and verification</td><td>More orchestration, but control and naturalness can be tuned independently</td></tr>
     </table>
     <div class="callout"><strong>Decision rule:</strong> use the simplest architecture that meets both the interaction SLO and the workflow&rsquo;s control requirements.</div>
-    <div class="credit">Ayush Joshi</div>
   </div>
 
   <!-- 8: Voice 3 / Ayush -->
@@ -448,7 +425,6 @@
       <li><strong>Test conversations, not components:</strong> a good ASR score, model score, and TTS score can still combine into a bad call.</li>
     </ul>
     <div class="callout"><strong>Minimum scorecard:</strong> end-of-turn to first audio, interruption recovery, false-cutoff rate, task completion, state consistency, escalation quality, and cost per completed outcome.</div>
-    <div class="credit">Ayush Joshi</div>
   </div>
 
   <!-- 9: Google overview / Siddharth -->
@@ -462,7 +438,6 @@
       <li><strong>Tool calling</strong> was the standout at the booth: DeepMind&rsquo;s tool-calling is a real edge for anyone building agents on top of the model.</li>
       <li><strong>The DeepMind mandate:</strong> research scientists, engineers, and ethicists building the next generation of AI systems safely and responsibly &mdash; the same lab behind <strong>AlphaFold</strong> and <strong>AlphaGo</strong>.</li>
     </ul>
-    <div class="credit">Siddharth Tayi</div>
   </div>
 
   <!-- 10: Gemini vs Gemma / Siddharth -->
@@ -476,7 +451,6 @@
       <tr><td>Language translation</td><td>Superior &mdash; supports far more languages</td><td>Good, but a narrower set of supported languages</td></tr>
     </table>
     <div class="callout">Default to <strong>Gemini 3.1 Flash</strong> for video and wide-language translation; <strong>Gemma</strong> earns its keep everywhere else.</div>
-    <div class="credit">Siddharth Tayi</div>
   </div>
 
   <!-- 11: Gemma 4 / Siddharth -->
@@ -494,7 +468,6 @@
       <li><strong>Built for agents:</strong> an intelligence-per-parameter design built natively for multi-step reasoning, multimodal processing, and function calling.</li>
     </ul>
     <div class="callout">The booth&rsquo;s best moment: this model running live, on a phone, in the demo &mdash; AI genuinely at your fingertips.</div>
-    <div class="credit">Siddharth Tayi</div>
   </div>
 
   <!-- 12: GLM DGX demo / Siddharth -->
@@ -511,7 +484,6 @@
       <li><strong>The longer arc:</strong> as models get more parameter-efficient, that same capability trickles down to older, lower-tier cards &mdash; RTX 30-series through 50-series &mdash; not just this year&rsquo;s flagship.</li>
     </ul>
     <div class="callout">Hardware efficiency, not just model size, is what determines when frontier intelligence fits under your desk.</div>
-    <div class="credit">Siddharth Tayi</div>
   </div>
 
   <!-- 13: Local LLMs / Siddharth -->
@@ -528,7 +500,6 @@
       <li><strong>The resource case for local:</strong> pitched as a way to cut cost across tokens, hardware, and natural resources like water &mdash; not just a latency or privacy win.</li>
     </ul>
     <div class="callout">Local inference is being pitched as a sustainability story as much as a cost story &mdash; a real counterweight to cloud-only strategy.</div>
-    <div class="credit">Siddharth Tayi</div>
   </div>
 
   <!-- 14: Model routing / Siddharth -->
@@ -542,7 +513,6 @@
       <li><strong>Model routing, defined:</strong> given a task, the platform selects the right model for it automatically &mdash; no manual wiring required.</li>
     </ul>
     <div class="callout">Every agent spun up this way carries its own model, context, memory, and tools: a mini harness in its own right.</div>
-    <div class="credit">Siddharth Tayi</div>
   </div>
 
   <!-- 15: Context/cost/cache / Siddharth -->
@@ -556,7 +526,6 @@
       <li><strong>The KV cache is the real lever, and it&rsquo;s still unsolved:</strong> context switching runs through it, but there&rsquo;s no clean way yet to target or optimize work against it directly. <span style="color:var(--ink-faint)">(A tool referenced as &ldquo;Cachette&rdquo; came up here (?).)</span></li>
       <li><strong>New operating habits for multi-model fleets:</strong> heartbeat every model, and keep a fallback configured for when one fails.</li>
     </ul>
-    <div class="credit">Siddharth Tayi</div>
   </div>
 
   <!-- 16: Harness evolution / Siddharth -->
@@ -572,7 +541,6 @@
       <tr><td>Agents on the fly</td><td>You just give Claude context; it spins up the agents it needs on the fly, using the harness already in place.</td></tr>
     </table>
     <div class="callout">Context, memory, and session state across this divide-and-conquer mix of models is still the open problem &mdash; the thing every vendor in the room was actively trying to solve.</div>
-    <div class="credit">Siddharth Tayi</div>
   </div>
 
   <!-- 17: Browserbase / Siddharth -->
@@ -585,7 +553,6 @@
       <li><strong>Prior art:</strong> I built a browser agent at a previous company that pulled tax data from county websites and ran OCR on it &mdash; the same shape of problem RealPage is solving now.</li>
       <li><strong>LLMs &rarr; LAMs:</strong> the same trajectory that turned a chat model into a working tax-scraping OCR agent is now a supported category &mdash; browser-based <strong>language action models (LAMs)</strong> &mdash; instead of something every team builds from scratch.</li>
     </ul>
-    <div class="credit">Siddharth Tayi</div>
   </div>
 
   <!-- 18: Colophon -->
