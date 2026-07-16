@@ -294,7 +294,7 @@
   <!-- 0: Hero -->
   <div class="slide layout-hero active" data-slide="0" data-tint="#a78bfa" data-topic="Overview">
     <h1>AI Engineer World&rsquo;s Fair 2026:<br><em>field notes, remixed</em></h1>
-    <div class="subtitle">Nine threads pulled from four days in San Francisco &mdash; loops, harness design, Google&rsquo;s latest, open-weight models, hardware, browser agents, model routing, and a few voice-agent lessons. Curated and written by Siddharth Tayi.</div>
+    <div class="subtitle">Eleven threads pulled from four days in San Francisco &mdash; loops, harness design, Google&rsquo;s latest, open-weight models, hardware, browser agents, model routing, MCP, observability, and a few voice-agent lessons. Curated and written by Siddharth Tayi.</div>
     <div class="tags">
       <span class="tag" style="--tag:#a78bfa">Harness</span>
       <span class="tag" style="--tag:#2dd4bf">Loops</span>
@@ -305,6 +305,8 @@
       <span class="tag" style="--tag:#22d3ee">Model routing</span>
       <span class="tag" style="--tag:#f472b6">Voice</span>
       <span class="tag" style="--tag:#fb923c">Browser agents</span>
+      <span class="tag" style="--tag:#818cf8">MCP</span>
+      <span class="tag" style="--tag:#eec080">Observability</span>
     </div>
     <div class="meta">RealPage &middot; IT &mdash; BEST &middot; San Francisco, Jun 29&ndash;Jul 2, 2026</div>
   </div>
@@ -579,8 +581,52 @@
     <div class="callout">Context, memory, and session state across this divide-and-conquer mix of models is still the open problem &mdash; the thing every vendor in the room was actively trying to solve.</div>
   </div>
 
-  <!-- 17: Browserbase / Siddharth (quote) -->
-  <div class="slide layout-quote" data-slide="17" data-tint="#fb923c" data-topic="Browser Agents">
+  <!-- 17: MCP tooling layer (cards) — from Joe Dean's original deck + Nikita Kothari (Salesforce) notes -->
+  <div class="slide layout-cards" data-slide="17" data-tint="#818cf8" data-topic="MCP">
+    <div class="tags"><span class="tag" style="--tag:#818cf8">MCP</span></div>
+    <h2 class="tight">MCP vs CLI vs Skills &mdash; a rubric, finally</h2>
+    <div class="thesis" style="font-size:16px; color:var(--ink-dim); font-family:'Inter',sans-serif; font-weight:500;">Three tooling layers, three jobs: doing, exposing, and teaching &mdash; and MCP is the one most likely to quietly bloat your context.</div>
+    <div class="card-grid cols-3">
+      <div class="info-card" style="--card-accent:#818cf8;">
+        <h3>CLI &mdash; do</h3>
+        <div class="who">act on the world</div>
+        <p>Reach for it when the agent needs to execute, compose, or pipe. Watch out for invisible failures &mdash; sandbox it.</p>
+      </div>
+      <div class="info-card" style="--card-accent:#818cf8;">
+        <h3>MCP &mdash; what</h3>
+        <div class="who">expose capabilities</div>
+        <p>Reach for it when many agents or tools need the same integration. Watch out for context explosion &mdash; 50 tool schemas &asymp; 15&ndash;20k tokens before any work happens.</p>
+      </div>
+      <div class="info-card" style="--card-accent:#818cf8;">
+        <h3>Skill &mdash; how</h3>
+        <div class="who">encode procedure</div>
+        <p>Reach for it when you&rsquo;re teaching a repeatable workflow. Watch out &mdash; it needs evals, or it&rsquo;s just an unverified guess at a process.</p>
+      </div>
+    </div>
+    <div class="callout">Factory&rsquo;s telemetry: sessions averaged ~330 available MCP tools &asymp; 47k tokens &mdash; and only <strong>5.4% of sessions ever called one</strong>. Salesforce&rsquo;s Nikita Kothari saw the same shape: skills&rsquo; on-demand loading cut one team&rsquo;s always-on 16.5k tokens to ~900&ndash;1,500 per task.</div>
+  </div>
+
+  <!-- 18: OTel / observability (split) — from the "Watch It Burn" workshop notes (Forrester & Lee) -->
+  <div class="slide layout-split" data-slide="18" data-tint="#eec080" data-topic="Observability">
+    <div class="tags"><span class="tag" style="--tag:#eec080">Observability</span></div>
+    <div class="split-grid">
+      <div class="split-lead">
+        <h2>Every agent action is a trace, not a black box</h2>
+        <div class="thesis">A workshop let the room jailbreak a real Kubernetes-hosted agent, then showed the fix &mdash; and the fix was only provable because everything was already OTel-instrumented.</div>
+      </div>
+      <div class="split-body">
+        <ul class="detail-items">
+          <li><strong>The setup:</strong> &ldquo;Build a Platform, Unleash an Agent on it&hellip; and Watch it Burn!&rdquo; (Michael Forrester &amp; Whitney Lee) &mdash; a burrito-ordering agent wired to a real cluster, jailbroken live via prompt injection.</li>
+          <li><strong>Reference architecture on display:</strong> the agent ran on Kubernetes via <strong>kagent</strong>, tools reached through an <strong>agentgateway MCP</strong> endpoint, model served via AWS Bedrock &mdash; all <strong>OpenTelemetry-instrumented into Datadog</strong>, with Kyverno + Falco as the security layer.</li>
+          <li><strong>The payoff:</strong> one trace showed 26 spans across ~5.4s &mdash; tool calls, the LLM&rsquo;s <code>generate_content</code> span, cost, tokens, and Kubernetes pod/deployment context all attached &mdash; so both the exploit and the block were visible as spans, not assumed.</li>
+        </ul>
+        <div class="callout">Guardrails belong at the platform layer &mdash; admission control and runtime detection &mdash; not just the prompt. OTel tracing is how you <em>prove</em> that, not just claim it.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 19: Browserbase / Siddharth (quote) -->
+  <div class="slide layout-quote" data-slide="19" data-tint="#fb923c" data-topic="Browser Agents">
     <div class="tags"><span class="tag" style="--tag:#fb923c">Browser agents</span></div>
     <div class="quote-mark">&ldquo;</div>
     <div class="pull-quote">Browserbase builds browser-based agents &mdash; and it&rsquo;s already the tool <span class="accent">my own team runs</span> on a live RealPage project. Met their sales engineer at the booth: small world.</div>
